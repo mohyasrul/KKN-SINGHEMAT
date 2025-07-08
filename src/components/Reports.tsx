@@ -20,7 +20,7 @@ import {
 import { useApp } from "@/contexts/AppContext";
 import type { Transaction } from "@/contexts/AppContext";
 import { formatCurrency, formatDate } from "@/utils/formatters";
-import { exportToExcel } from "@/utils/excelExport";
+import { exportToExcel } from "@/utils/excelExportFixed";
 import {
   Download,
   FileText,
@@ -338,6 +338,15 @@ const Reports = () => {
     setIsExporting(true);
 
     try {
+      // Validate data before export
+      if (!filteredTransactions || filteredTransactions.length === 0) {
+        throw new Error("Tidak ada data transaksi untuk diexport");
+      }
+
+      if (!programs) {
+        throw new Error("Data program tidak tersedia");
+      }
+
       const exportData = {
         transactions: filteredTransactions,
         programs: programs,
@@ -350,7 +359,7 @@ const Reports = () => {
       };
 
       const timestamp = new Date().toISOString().split("T")[0];
-      const filename = `KKN-Budget-Report-${reportType}-${timestamp}.xlsx`;
+      const filename = `Financial-Report-Professional-${timestamp}.xlsx`;
 
       const result = await exportToExcel(exportData, filename);
 
@@ -361,13 +370,19 @@ const Reports = () => {
           variant: "default",
         });
       } else {
-        throw new Error(result.error);
+        throw new Error(result.error || "Export gagal tanpa pesan error");
       }
     } catch (error) {
-      console.error("Export error:", error);
+      console.error("Export error details:", error);
+
+      let errorMessage = "Terjadi kesalahan saat membuat file Excel";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+
       toast({
         title: "Export Gagal",
-        description: "Terjadi kesalahan saat membuat file Excel",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

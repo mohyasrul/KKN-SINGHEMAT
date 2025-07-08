@@ -15,8 +15,8 @@ export default defineConfig(() => ({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "apple-touch-icon.png", "masked-icon.svg"],
       manifest: {
-        name: "KKN Budget Nexus",
-        short_name: "KKN Budget",
+        name: "KKN 15 Cidatar",
+        short_name: "KKN 15",
         description: "Offline budget management app for KKN programs",
         theme_color: "#3B82F6",
         background_color: "#ffffff",
