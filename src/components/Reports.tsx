@@ -420,7 +420,7 @@ const Reports = () => {
                 Laporan Keuangan Komprehensif
               </p>
             </div>
-            
+
             {/* Action Buttons - Mobile */}
             <div className="flex items-center gap-2 lg:hidden">
               {/* Filter Button - Mobile */}
@@ -440,7 +440,7 @@ const Reports = () => {
                       Sesuaikan filter untuk melihat data yang diinginkan
                     </SheetDescription>
                   </SheetHeader>
-                  
+
                   <div className="space-y-6">
                     {/* Filter Controls */}
                     <div className="space-y-4">
@@ -448,19 +448,30 @@ const Reports = () => {
                         <label className="block text-sm font-medium mb-2 text-gray-700">
                           Jenis Laporan
                         </label>
-                        <Select value={reportType} onValueChange={setReportType}>
+                        <Select
+                          value={reportType}
+                          onValueChange={setReportType}
+                        >
                           <SelectTrigger className="h-12">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="comprehensive">📊 Komprehensif</SelectItem>
-                            <SelectItem value="income">💰 Fokus Pemasukan</SelectItem>
-                            <SelectItem value="expenses">💸 Fokus Pengeluaran</SelectItem>
-                            <SelectItem value="programs">🎯 Program Kerja</SelectItem>
+                            <SelectItem value="comprehensive">
+                              📊 Komprehensif
+                            </SelectItem>
+                            <SelectItem value="income">
+                              💰 Fokus Pemasukan
+                            </SelectItem>
+                            <SelectItem value="expenses">
+                              💸 Fokus Pengeluaran
+                            </SelectItem>
+                            <SelectItem value="programs">
+                              🎯 Program Kerja
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
-                      
+
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <label className="block text-sm font-medium mb-2 text-gray-700">
@@ -486,7 +497,7 @@ const Reports = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     {/* Reset Button */}
                     <Button
                       variant="outline"
@@ -499,10 +510,12 @@ const Reports = () => {
                     >
                       🔄 Reset Filter
                     </Button>
-                    
+
                     {/* Export Actions */}
                     <div className="pt-4 border-t border-gray-200">
-                      <h3 className="text-sm font-medium text-gray-700 mb-3">Export Data</h3>
+                      <h3 className="text-sm font-medium text-gray-700 mb-3">
+                        Export Data
+                      </h3>
                       <div className="space-y-3">
                         <Button
                           onClick={generateCSV}
@@ -514,7 +527,9 @@ const Reports = () => {
                         </Button>
                         <Button
                           onClick={generateExcel}
-                          disabled={isExporting || filteredTransactions.length === 0}
+                          disabled={
+                            isExporting || filteredTransactions.length === 0
+                          }
                           className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-base"
                         >
                           {isExporting ? (
@@ -529,7 +544,7 @@ const Reports = () => {
                   </div>
                 </SheetContent>
               </Sheet>
-              
+
               {/* More Actions - Mobile */}
               <Sheet>
                 <SheetTrigger asChild>
@@ -553,7 +568,9 @@ const Reports = () => {
                     </Button>
                     <Button
                       onClick={generateExcel}
-                      disabled={isExporting || filteredTransactions.length === 0}
+                      disabled={
+                        isExporting || filteredTransactions.length === 0
+                      }
                       variant="outline"
                       className="w-full h-12 text-base justify-start"
                     >
@@ -568,7 +585,7 @@ const Reports = () => {
                 </SheetContent>
               </Sheet>
             </div>
-            
+
             {/* Desktop Export Buttons */}
             <div className="hidden lg:flex lg:gap-2">
               <Button
@@ -682,10 +699,15 @@ const Reports = () => {
                     {formatCurrency(totalIncome)}
                   </p>
                   <div className="flex items-center gap-1">
-                    <Badge variant="secondary" className="text-xs bg-green-200 text-green-800 px-1.5 py-0.5">
+                    <Badge
+                      variant="secondary"
+                      className="text-xs bg-green-200 text-green-800 px-1.5 py-0.5"
+                    >
                       {filteredIncome.length}
                     </Badge>
-                    <span className="text-xs text-green-600 hidden lg:inline">transaksi</span>
+                    <span className="text-xs text-green-600 hidden lg:inline">
+                      transaksi
+                    </span>
                   </div>
                 </div>
                 <div className="hidden lg:block p-3 rounded-full bg-green-100">
@@ -712,10 +734,15 @@ const Reports = () => {
                     {formatCurrency(totalExpense)}
                   </p>
                   <div className="flex items-center gap-1">
-                    <Badge variant="secondary" className="text-xs bg-red-200 text-red-800 px-1.5 py-0.5">
+                    <Badge
+                      variant="secondary"
+                      className="text-xs bg-red-200 text-red-800 px-1.5 py-0.5"
+                    >
                       {filteredExpenses.length}
                     </Badge>
-                    <span className="text-xs text-red-600 hidden lg:inline">transaksi</span>
+                    <span className="text-xs text-red-600 hidden lg:inline">
+                      transaksi
+                    </span>
                   </div>
                 </div>
                 <div className="hidden lg:block p-3 rounded-full bg-red-100">
@@ -726,43 +753,58 @@ const Reports = () => {
           </Card>
 
           {/* Saldo */}
-          <Card className={`bg-gradient-to-br border-2 hover:shadow-lg transition-all duration-200 ${
-            balance >= 0 
-              ? "from-blue-50 to-blue-100 border-blue-200" 
-              : "from-red-50 to-red-100 border-red-200"
-          }`}>
+          <Card
+            className={`bg-gradient-to-br border-2 hover:shadow-lg transition-all duration-200 ${
+              balance >= 0
+                ? "from-blue-50 to-blue-100 border-blue-200"
+                : "from-red-50 to-red-100 border-red-200"
+            }`}
+          >
             <CardContent className="p-3 lg:p-6">
               <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <div className={`p-1.5 lg:p-2 rounded-lg text-white lg:hidden ${
-                      balance >= 0 ? "bg-blue-500" : "bg-red-500"
-                    }`}>
+                    <div
+                      className={`p-1.5 lg:p-2 rounded-lg text-white lg:hidden ${
+                        balance >= 0 ? "bg-blue-500" : "bg-red-500"
+                      }`}
+                    >
                       <DollarSign className="h-3 w-3" />
                     </div>
-                    <p className={`text-xs lg:text-sm font-medium truncate ${
-                      balance >= 0 ? "text-blue-700" : "text-red-700"
-                    }`}>
+                    <p
+                      className={`text-xs lg:text-sm font-medium truncate ${
+                        balance >= 0 ? "text-blue-700" : "text-red-700"
+                      }`}
+                    >
                       Saldo
                     </p>
                   </div>
-                  <p className={`text-sm lg:text-2xl font-bold mb-1 break-words ${
-                    balance >= 0 ? "text-blue-800" : "text-red-800"
-                  }`}>
+                  <p
+                    className={`text-sm lg:text-2xl font-bold mb-1 break-words ${
+                      balance >= 0 ? "text-blue-800" : "text-red-800"
+                    }`}
+                  >
                     {formatCurrency(balance)}
                   </p>
                   <div className="flex items-center gap-1">
-                    <Badge variant={balance >= 0 ? "default" : "destructive"} className="text-xs px-1.5 py-0.5">
+                    <Badge
+                      variant={balance >= 0 ? "default" : "destructive"}
+                      className="text-xs px-1.5 py-0.5"
+                    >
                       {balance >= 0 ? "Surplus" : "Defisit"}
                     </Badge>
                   </div>
                 </div>
-                <div className={`hidden lg:block p-3 rounded-full ${
-                  balance >= 0 ? "bg-blue-100" : "bg-red-100"
-                }`}>
-                  <DollarSign className={`h-6 w-6 ${
-                    balance >= 0 ? "text-blue-600" : "text-red-600"
-                  }`} />
+                <div
+                  className={`hidden lg:block p-3 rounded-full ${
+                    balance >= 0 ? "bg-blue-100" : "bg-red-100"
+                  }`}
+                >
+                  <DollarSign
+                    className={`h-6 w-6 ${
+                      balance >= 0 ? "text-blue-600" : "text-red-600"
+                    }`}
+                  />
                 </div>
               </div>
             </CardContent>
@@ -785,8 +827,15 @@ const Reports = () => {
                     {programs.length}
                   </p>
                   <div className="flex items-center gap-1">
-                    <Badge variant="secondary" className="text-xs bg-purple-200 text-purple-800 px-1.5 py-0.5">
-                      {programs.filter((p) => p.usedBudget < p.allocatedBudget).length} aktif
+                    <Badge
+                      variant="secondary"
+                      className="text-xs bg-purple-200 text-purple-800 px-1.5 py-0.5"
+                    >
+                      {
+                        programs.filter((p) => p.usedBudget < p.allocatedBudget)
+                          .length
+                      }{" "}
+                      aktif
                     </Badge>
                   </div>
                 </div>
@@ -798,138 +847,303 @@ const Reports = () => {
           </Card>
         </div>
 
-      {/* Report Content Based on Type */}
-      {reportType === "comprehensive" && (
-        <>
-          {/* Income by Category */}
+        {/* Report Content Based on Type */}
+        {reportType === "comprehensive" && (
+          <>
+            {/* Income by Category */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Pemasukan per Kategori</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Kategori</TableHead>
+                      <TableHead className="text-right">
+                        Jumlah Transaksi
+                      </TableHead>
+                      <TableHead className="text-right">Total</TableHead>
+                      <TableHead className="text-right">Persentase</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {Object.entries(incomeByCategory).map(
+                      ([category, amount]) => {
+                        const count = filteredIncome.filter(
+                          (t) =>
+                            (t.category || "Tidak Dikategorikan") === category
+                        ).length;
+                        const percentage =
+                          totalIncome > 0
+                            ? ((amount / totalIncome) * 100).toFixed(1)
+                            : "0";
+                        return (
+                          <TableRow key={category}>
+                            <TableCell className="font-medium">
+                              {category}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {count}
+                            </TableCell>
+                            <TableCell className="text-right text-green-600 font-semibold">
+                              {formatCurrency(amount)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {percentage}%
+                            </TableCell>
+                          </TableRow>
+                        );
+                      }
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+
+            {/* Expense by Category */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Pengeluaran per Kategori</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Kategori</TableHead>
+                      <TableHead className="text-right">
+                        Jumlah Transaksi
+                      </TableHead>
+                      <TableHead className="text-right">Total</TableHead>
+                      <TableHead className="text-right">Persentase</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {Object.entries(expenseByCategory).map(
+                      ([category, amount]) => {
+                        const count = filteredExpenses.filter(
+                          (t) =>
+                            (t.category || "Tidak Dikategorikan") === category
+                        ).length;
+                        const percentage =
+                          totalExpense > 0
+                            ? ((amount / totalExpense) * 100).toFixed(1)
+                            : "0";
+                        return (
+                          <TableRow key={category}>
+                            <TableCell className="font-medium">
+                              {category}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {count}
+                            </TableCell>
+                            <TableCell className="text-right text-red-600 font-semibold">
+                              {formatCurrency(amount)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {percentage}%
+                            </TableCell>
+                          </TableRow>
+                        );
+                      }
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+
+            {/* Program Analysis */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Analisis Program Kerja</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Program</TableHead>
+                      <TableHead className="text-right">Alokasi</TableHead>
+                      <TableHead className="text-right">Terpakai</TableHead>
+                      <TableHead className="text-right">Sisa</TableHead>
+                      <TableHead className="text-right">Persentase</TableHead>
+                      <TableHead className="text-right">Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {programExpenses.map((program) => {
+                      const status =
+                        program.percentage > 100
+                          ? "Over Budget"
+                          : program.percentage > 80
+                          ? "Hampir Habis"
+                          : "Aman";
+                      const statusColor =
+                        program.percentage > 100
+                          ? "text-red-600"
+                          : program.percentage > 80
+                          ? "text-yellow-600"
+                          : "text-green-600";
+
+                      return (
+                        <TableRow key={program.id}>
+                          <TableCell className="font-medium">
+                            {program.name}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {formatCurrency(program.allocatedBudget)}
+                          </TableCell>
+                          <TableCell className="text-right text-red-600">
+                            {formatCurrency(program.totalExpense)}
+                          </TableCell>
+                          <TableCell className="text-right text-blue-600">
+                            {formatCurrency(program.remainingBudget)}
+                          </TableCell>
+                          <TableCell
+                            className={`text-right font-semibold ${statusColor}`}
+                          >
+                            {program.percentage.toFixed(1)}%
+                          </TableCell>
+                          <TableCell
+                            className={`text-right font-semibold ${statusColor}`}
+                          >
+                            {status}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                    <TableRow className="border-t-2">
+                      <TableCell className="font-medium">
+                        Pengeluaran Umum
+                      </TableCell>
+                      <TableCell className="text-right">-</TableCell>
+                      <TableCell className="text-right text-red-600">
+                        {formatCurrency(totalGeneralExpenses)}
+                      </TableCell>
+                      <TableCell className="text-right">-</TableCell>
+                      <TableCell className="text-right">-</TableCell>
+                      <TableCell className="text-right text-gray-600">
+                        Umum
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </>
+        )}
+
+        {reportType === "income" && (
           <Card>
             <CardHeader>
-              <CardTitle>Pemasukan per Kategori</CardTitle>
+              <CardTitle>Detail Pemasukan</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Tanggal</TableHead>
+                    <TableHead>Keterangan</TableHead>
                     <TableHead>Kategori</TableHead>
-                    <TableHead className="text-right">
-                      Jumlah Transaksi
-                    </TableHead>
-                    <TableHead className="text-right">Total</TableHead>
-                    <TableHead className="text-right">Persentase</TableHead>
+                    <TableHead>Dibuat Oleh</TableHead>
+                    <TableHead className="text-right">Jumlah</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {Object.entries(incomeByCategory).map(
-                    ([category, amount]) => {
-                      const count = filteredIncome.filter(
-                        (t) =>
-                          (t.category || "Tidak Dikategorikan") === category
-                      ).length;
-                      const percentage =
-                        totalIncome > 0
-                          ? ((amount / totalIncome) * 100).toFixed(1)
-                          : "0";
-                      return (
-                        <TableRow key={category}>
-                          <TableCell className="font-medium">
-                            {category}
-                          </TableCell>
-                          <TableCell className="text-right">{count}</TableCell>
-                          <TableCell className="text-right text-green-600 font-semibold">
-                            {formatCurrency(amount)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {percentage}%
-                          </TableCell>
-                        </TableRow>
-                      );
-                    }
-                  )}
+                  {filteredIncome.map((transaction) => (
+                    <TableRow key={transaction.id}>
+                      <TableCell>{formatDate(transaction.date)}</TableCell>
+                      <TableCell>{transaction.description}</TableCell>
+                      <TableCell>
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                          {transaction.category || "Tidak Dikategorikan"}
+                        </span>
+                      </TableCell>
+                      <TableCell>{transaction.createdBy}</TableCell>
+                      <TableCell className="text-right font-semibold text-green-600">
+                        +{formatCurrency(transaction.amount)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </CardContent>
           </Card>
+        )}
 
-          {/* Expense by Category */}
+        {reportType === "expenses" && (
           <Card>
             <CardHeader>
-              <CardTitle>Pengeluaran per Kategori</CardTitle>
+              <CardTitle>Detail Pengeluaran</CardTitle>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead>Tanggal</TableHead>
+                    <TableHead>Keterangan</TableHead>
                     <TableHead>Kategori</TableHead>
-                    <TableHead className="text-right">
-                      Jumlah Transaksi
-                    </TableHead>
-                    <TableHead className="text-right">Total</TableHead>
-                    <TableHead className="text-right">Persentase</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {Object.entries(expenseByCategory).map(
-                    ([category, amount]) => {
-                      const count = filteredExpenses.filter(
-                        (t) =>
-                          (t.category || "Tidak Dikategorikan") === category
-                      ).length;
-                      const percentage =
-                        totalExpense > 0
-                          ? ((amount / totalExpense) * 100).toFixed(1)
-                          : "0";
-                      return (
-                        <TableRow key={category}>
-                          <TableCell className="font-medium">
-                            {category}
-                          </TableCell>
-                          <TableCell className="text-right">{count}</TableCell>
-                          <TableCell className="text-right text-red-600 font-semibold">
-                            {formatCurrency(amount)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {percentage}%
-                          </TableCell>
-                        </TableRow>
-                      );
-                    }
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-
-          {/* Program Analysis */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Analisis Program Kerja</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
                     <TableHead>Program</TableHead>
+                    <TableHead>Dibuat Oleh</TableHead>
+                    <TableHead className="text-right">Jumlah</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredExpenses.map((transaction) => {
+                    const programName = transaction.programId
+                      ? programs.find((p) => p.id === transaction.programId)
+                          ?.name || "Tidak Diketahui"
+                      : "Umum";
+
+                    return (
+                      <TableRow key={transaction.id}>
+                        <TableCell>{formatDate(transaction.date)}</TableCell>
+                        <TableCell>{transaction.description}</TableCell>
+                        <TableCell>
+                          <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                            {transaction.category || "Tidak Dikategorikan"}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                            {programName}
+                          </span>
+                        </TableCell>
+                        <TableCell>{transaction.createdBy}</TableCell>
+                        <TableCell className="text-right font-semibold text-red-600">
+                          -{formatCurrency(transaction.amount)}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
+
+        {reportType === "programs" && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Laporan Program Kerja</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nama Program</TableHead>
                     <TableHead className="text-right">Alokasi</TableHead>
                     <TableHead className="text-right">Terpakai</TableHead>
                     <TableHead className="text-right">Sisa</TableHead>
                     <TableHead className="text-right">Persentase</TableHead>
-                    <TableHead className="text-right">Status</TableHead>
+                    <TableHead className="text-right">Transaksi</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {programExpenses.map((program) => {
-                    const status =
-                      program.percentage > 100
-                        ? "Over Budget"
-                        : program.percentage > 80
-                        ? "Hampir Habis"
-                        : "Aman";
-                    const statusColor =
-                      program.percentage > 100
-                        ? "text-red-600"
-                        : program.percentage > 80
-                        ? "text-yellow-600"
-                        : "text-green-600";
+                    const percentage =
+                      program.allocatedBudget > 0
+                        ? (program.totalExpense / program.allocatedBudget) * 100
+                        : 0;
 
                     return (
                       <TableRow key={program.id}>
@@ -943,193 +1157,32 @@ const Reports = () => {
                           {formatCurrency(program.totalExpense)}
                         </TableCell>
                         <TableCell className="text-right text-blue-600">
-                          {formatCurrency(program.remainingBudget)}
+                          {formatCurrency(
+                            program.allocatedBudget - program.totalExpense
+                          )}
                         </TableCell>
                         <TableCell
-                          className={`text-right font-semibold ${statusColor}`}
+                          className={`text-right font-semibold ${
+                            percentage > 100
+                              ? "text-red-600"
+                              : percentage > 80
+                              ? "text-yellow-600"
+                              : "text-green-600"
+                          }`}
                         >
-                          {program.percentage.toFixed(1)}%
+                          {percentage.toFixed(1)}%
                         </TableCell>
-                        <TableCell
-                          className={`text-right font-semibold ${statusColor}`}
-                        >
-                          {status}
+                        <TableCell className="text-right">
+                          {program.expenses.length}
                         </TableCell>
                       </TableRow>
                     );
                   })}
-                  <TableRow className="border-t-2">
-                    <TableCell className="font-medium">
-                      Pengeluaran Umum
-                    </TableCell>
-                    <TableCell className="text-right">-</TableCell>
-                    <TableCell className="text-right text-red-600">
-                      {formatCurrency(totalGeneralExpenses)}
-                    </TableCell>
-                    <TableCell className="text-right">-</TableCell>
-                    <TableCell className="text-right">-</TableCell>
-                    <TableCell className="text-right text-gray-600">
-                      Umum
-                    </TableCell>
-                  </TableRow>
                 </TableBody>
               </Table>
             </CardContent>
           </Card>
-        </>
-      )}
-
-      {reportType === "income" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Detail Pemasukan</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead>Keterangan</TableHead>
-                  <TableHead>Kategori</TableHead>
-                  <TableHead>Dibuat Oleh</TableHead>
-                  <TableHead className="text-right">Jumlah</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredIncome.map((transaction) => (
-                  <TableRow key={transaction.id}>
-                    <TableCell>{formatDate(transaction.date)}</TableCell>
-                    <TableCell>{transaction.description}</TableCell>
-                    <TableCell>
-                      <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                        {transaction.category || "Tidak Dikategorikan"}
-                      </span>
-                    </TableCell>
-                    <TableCell>{transaction.createdBy}</TableCell>
-                    <TableCell className="text-right font-semibold text-green-600">
-                      +{formatCurrency(transaction.amount)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      )}
-
-      {reportType === "expenses" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Detail Pengeluaran</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Tanggal</TableHead>
-                  <TableHead>Keterangan</TableHead>
-                  <TableHead>Kategori</TableHead>
-                  <TableHead>Program</TableHead>
-                  <TableHead>Dibuat Oleh</TableHead>
-                  <TableHead className="text-right">Jumlah</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredExpenses.map((transaction) => {
-                  const programName = transaction.programId
-                    ? programs.find((p) => p.id === transaction.programId)
-                        ?.name || "Tidak Diketahui"
-                    : "Umum";
-
-                  return (
-                    <TableRow key={transaction.id}>
-                      <TableCell>{formatDate(transaction.date)}</TableCell>
-                      <TableCell>{transaction.description}</TableCell>
-                      <TableCell>
-                        <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                          {transaction.category || "Tidak Dikategorikan"}
-                        </span>
-                      </TableCell>
-                      <TableCell>
-                        <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
-                          {programName}
-                        </span>
-                      </TableCell>
-                      <TableCell>{transaction.createdBy}</TableCell>
-                      <TableCell className="text-right font-semibold text-red-600">
-                        -{formatCurrency(transaction.amount)}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      )}
-
-      {reportType === "programs" && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Laporan Program Kerja</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nama Program</TableHead>
-                  <TableHead className="text-right">Alokasi</TableHead>
-                  <TableHead className="text-right">Terpakai</TableHead>
-                  <TableHead className="text-right">Sisa</TableHead>
-                  <TableHead className="text-right">Persentase</TableHead>
-                  <TableHead className="text-right">Transaksi</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {programExpenses.map((program) => {
-                  const percentage =
-                    program.allocatedBudget > 0
-                      ? (program.totalExpense / program.allocatedBudget) * 100
-                      : 0;
-
-                  return (
-                    <TableRow key={program.id}>
-                      <TableCell className="font-medium">
-                        {program.name}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {formatCurrency(program.allocatedBudget)}
-                      </TableCell>
-                      <TableCell className="text-right text-red-600">
-                        {formatCurrency(program.totalExpense)}
-                      </TableCell>
-                      <TableCell className="text-right text-blue-600">
-                        {formatCurrency(
-                          program.allocatedBudget - program.totalExpense
-                        )}
-                      </TableCell>
-                      <TableCell
-                        className={`text-right font-semibold ${
-                          percentage > 100
-                            ? "text-red-600"
-                            : percentage > 80
-                            ? "text-yellow-600"
-                            : "text-green-600"
-                        }`}
-                      >
-                        {percentage.toFixed(1)}%
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {program.expenses.length}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      )}
+        )}
       </div>
     </div>
   );
