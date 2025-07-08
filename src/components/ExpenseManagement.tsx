@@ -156,7 +156,9 @@ const ExpenseManagement = () => {
                       className="bg-red-600 hover:bg-red-700 lg:px-4"
                     >
                       <Minus className="h-4 w-4 lg:mr-2" />
-                      <span className="hidden lg:inline">Tambah Pengeluaran</span>
+                      <span className="hidden lg:inline">
+                        Tambah Pengeluaran
+                      </span>
                     </Button>
                   </DialogTrigger>
                   <DialogContent className="mx-4 max-w-md lg:max-w-lg max-h-[90vh] overflow-y-auto">
@@ -246,7 +248,10 @@ const ExpenseManagement = () => {
                         <Select
                           value={formData.category}
                           onValueChange={(value) =>
-                            setFormData((prev) => ({ ...prev, category: value }))
+                            setFormData((prev) => ({
+                              ...prev,
+                              category: value,
+                            }))
                           }
                         >
                           <SelectTrigger>
@@ -269,7 +274,10 @@ const ExpenseManagement = () => {
                         <Select
                           value={formData.programId}
                           onValueChange={(value) =>
-                            setFormData((prev) => ({ ...prev, programId: value }))
+                            setFormData((prev) => ({
+                              ...prev,
+                              programId: value,
+                            }))
                           }
                         >
                           <SelectTrigger>
@@ -310,7 +318,7 @@ const ExpenseManagement = () => {
                         <Button
                           type="button"
                           variant="outline"
-                          onClick={resetForm}
+                          onClick={() => setIsDialogOpen(false)}
                           className="h-12 lg:h-10"
                         >
                           Batal
@@ -355,77 +363,177 @@ const ExpenseManagement = () => {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Main Content */}
+      </div>      {/* Main Content */}
       <div className="px-4 pb-4 space-y-4 lg:px-0 lg:pb-0 lg:space-y-6">
-        {/* Enhanced mobile-optimized expense list with badges and compact layout */}
-        {expenseTransactions.length === 0 ? (
-          <Card>
-            <CardContent className="p-8 text-center">
-              <p className="text-gray-500">Belum ada data pengeluaran</p>
-            </CardContent>
-          </Card>
-        ) : (
-          expenseTransactions.map((transaction) => (
-            <Card
-              key={transaction.id}
-              className="hover:shadow-md transition-shadow"
-            >
-              <CardContent className="p-6">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <h3 className="font-semibold text-lg">
-                        {transaction.description}
-                      </h3>
-                      <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                        {transaction.category}
-                      </span>
-                      {transaction.programId && (
-                        <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
-                          {getProgramName(transaction.programId)}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="h-4 w-4" />
-                        <span>{formatDateTime(transaction.date)}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <User className="h-4 w-4" />
-                        <span>{transaction.createdBy}</span>
-                      </div>
-                      {transaction.receipt && (
-                        <div className="flex items-center space-x-1">
-                          <Camera className="h-4 w-4" />
-                          <span>Ada bukti</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <p className="text-2xl font-bold text-red-600">
-                      -{formatCurrency(transaction.amount)}
+        {/* Expense Transactions */}
+        <div className="space-y-3 lg:space-y-4">
+          {expenseTransactions.length === 0 ? (
+            <Card className="mx-auto max-w-md lg:max-w-none">
+              <CardContent className="p-8 text-center">
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="p-4 bg-red-100 rounded-full">
+                    <CreditCard className="h-8 w-8 text-red-500" />
+                  </div>
+                  <div>
+                    <p className="text-gray-500 font-medium">
+                      Belum ada pengeluaran
+                    </p>
+                    <p className="text-sm text-gray-400 mt-1">
+                      Mulai dengan mencatat pengeluaran pertama
                     </p>
                   </div>
-
-                  {canDelete && (
+                  {user?.role === "treasurer" && (
                     <Button
-                      onClick={() => handleDelete(transaction.id)}
-                      variant="ghost"
-                      size="sm"
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      onClick={() => setIsDialogOpen(true)}
+                      className="bg-red-600 hover:bg-red-700 mt-4"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Minus className="mr-2 h-4 w-4" />
+                      Tambah Pengeluaran Pertama
                     </Button>
                   )}
                 </div>
               </CardContent>
             </Card>
-          ))
-        )}
+          ) : (
+            expenseTransactions.map((transaction) => (
+              <Card
+                key={transaction.id}
+                className="hover:shadow-lg transition-all duration-200 border-l-4 border-l-red-500"
+              >
+                <CardContent className="p-4 lg:p-6">
+                  {/* Mobile Layout */}
+                  <div className="lg:hidden">
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-base text-gray-900 mb-1">
+                          {transaction.description}
+                        </h3>
+                        <p className="text-xl font-bold text-red-600 mb-2">
+                          -{formatCurrency(transaction.amount)}
+                        </p>
+                      </div>
+                      {canDelete && (
+                        <Sheet>
+                          <SheetTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="p-1.5 ml-2 flex-shrink-0"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </SheetTrigger>
+                          <SheetContent side="bottom" className="h-[25vh]">
+                            <SheetHeader className="pb-4">
+                              <SheetTitle>Kelola Transaksi</SheetTitle>
+                              <SheetDescription className="truncate">
+                                {transaction.description}
+                              </SheetDescription>
+                            </SheetHeader>
+                            <div className="space-y-3">
+                              <Button
+                                onClick={() => handleDelete(transaction.id)}
+                                variant="outline"
+                                className="w-full h-12 text-base justify-start text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="mr-3 h-5 w-5" />
+                                Hapus Transaksi
+                              </Button>
+                            </div>
+                          </SheetContent>
+                        </Sheet>
+                      )}
+                    </div>
+
+                    {/* Badges */}
+                    <div className="flex flex-wrap gap-2 mb-3">
+                      <Badge variant="secondary" className="bg-red-50 text-red-700 border-0 text-xs">
+                        {transaction.category || "Tidak Dikategorikan"}
+                      </Badge>
+                      {transaction.programId && (
+                        <Badge variant="secondary" className="bg-purple-50 text-purple-700 border-0 text-xs">
+                          {getProgramName(transaction.programId)}
+                        </Badge>
+                      )}
+                      {transaction.receipt && (
+                        <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-0 text-xs">
+                          <Receipt className="h-3 w-3 mr-1" />
+                          Bukti
+                        </Badge>
+                      )}
+                    </div>
+
+                    {/* Info Grid */}
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div className="flex items-center gap-1.5 text-gray-600">
+                        <Calendar className="h-3 w-3" />
+                        <span>{formatDateTime(transaction.date)}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-gray-600">
+                        <User className="h-3 w-3" />
+                        <span>{transaction.createdBy}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Desktop Layout */}
+                  <div className="hidden lg:block">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <h3 className="font-semibold text-lg">
+                            {transaction.description}
+                          </h3>
+                          <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                            {transaction.category}
+                          </span>
+                          {transaction.programId && (
+                            <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">
+                              {getProgramName(transaction.programId)}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                          <div className="flex items-center space-x-1">
+                            <Calendar className="h-4 w-4" />
+                            <span>{formatDateTime(transaction.date)}</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <User className="h-4 w-4" />
+                            <span>{transaction.createdBy}</span>
+                          </div>
+                          {transaction.receipt && (
+                            <div className="flex items-center space-x-1">
+                              <Camera className="h-4 w-4" />
+                              <span>Ada bukti</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <p className="text-2xl font-bold text-red-600">
+                          -{formatCurrency(transaction.amount)}
+                        </p>
+                      </div>
+
+                      {canDelete && (
+                        <Button
+                          onClick={() => handleDelete(transaction.id)}
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
