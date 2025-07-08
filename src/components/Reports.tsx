@@ -20,6 +20,7 @@ import {
 import { useApp } from "@/contexts/AppContext";
 import type { Transaction } from "@/contexts/AppContext";
 import { formatCurrency, formatDate } from "@/utils/formatters";
+import { exportToExcel } from "@/utils/excelExport";
 import {
   Download,
   FileText,
@@ -28,6 +29,8 @@ import {
   TrendingDown,
   DollarSign,
   Target,
+  FileSpreadsheet,
+  Loader2,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -44,6 +47,7 @@ const Reports = () => {
   const [dateTo, setDateTo] = useState("");
   const [reportType, setReportType] = useState("comprehensive");
   const [selectedProgram, setSelectedProgram] = useState("");
+  const [isExporting, setIsExporting] = useState(false);
 
   const filterTransactionsByDate = (transactions: Transaction[]) => {
     if (!dateFrom && !dateTo) return transactions;
@@ -330,19 +334,75 @@ const Reports = () => {
     });
   };
 
+  const generateExcel = async () => {
+    setIsExporting(true);
+    
+    try {
+      const exportData = {
+        transactions: filteredTransactions,
+        programs: programs,
+        summary: {
+          totalIncome,
+          totalExpense,
+          balance,
+          programCount: programs.length
+        }
+      };
+
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `KKN-Budget-Report-${reportType}-${timestamp}.xlsx`;
+
+      const result = await exportToExcel(exportData, filename);
+      
+      if (result.success) {
+        toast({
+          title: "Export Berhasil! 📊",
+          description: `Laporan Excel telah diunduh: ${result.filename}`,
+          variant: "default"
+        });
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Export error:', error);
+      toast({
+        title: "Export Gagal",
+        description: "Terjadi kesalahan saat membuat file Excel",
+        variant: "destructive"
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">
           Laporan Keuangan Komprehensif
         </h2>
-        <Button
-          onClick={generateCSV}
-          className="bg-green-600 hover:bg-green-700"
-        >
-          <Download className="mr-2 h-4 w-4" />
-          Export CSV
-        </Button>
+        <div className="flex space-x-2">
+          <Button
+            onClick={generateCSV}
+            className="bg-green-600 hover:bg-green-700"
+            disabled={filteredTransactions.length === 0}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Export CSV
+          </Button>
+          <Button
+            onClick={generateExcel}
+            disabled={isExporting || filteredTransactions.length === 0}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            {isExporting ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <FileSpreadsheet className="mr-2 h-4 w-4" />
+            )}
+            {isExporting ? 'Exporting...' : 'Export Excel'}
+          </Button>
+        </div>
       </div>
 
       {/* Filter Section */}
@@ -402,6 +462,46 @@ const Reports = () => {
             >
               Reset Filter
             </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Export Information */}
+      <Card className="bg-gradient-to-r from-blue-50 to-green-50 border-blue-200">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-blue-800">
+            <FileSpreadsheet className="h-5 w-5" />
+            Format Laporan Excel Professional
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <h4 className="font-semibold text-blue-700">5 Sheet Excel yang Tersedia:</h4>
+              <ul className="text-sm space-y-1 text-gray-700">
+                <li>• <strong>Ringkasan</strong> - Overview keuangan keseluruhan</li>
+                <li>• <strong>Transaksi</strong> - Detail semua pemasukan & pengeluaran</li>
+                <li>• <strong>Program</strong> - Analisis anggaran per program kerja</li>
+                <li>• <strong>Analisis Bulanan</strong> - Tren keuangan per bulan</li>
+                <li>• <strong>Analisis Kategori</strong> - Breakdown pengeluaran per kategori</li>
+              </ul>
+            </div>
+            <div className="space-y-2">
+              <h4 className="font-semibold text-green-700">Keunggulan Excel vs CSV:</h4>
+              <ul className="text-sm space-y-1 text-gray-700">
+                <li>• Format mata uang Rupiah otomatis</li>
+                <li>• Multiple sheets terorganisir</li>
+                <li>• Kolom dengan lebar optimal</li>
+                <li>• Ready untuk presentasi & print</li>
+                <li>• Formula perhitungan otomatis</li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-4 p-3 bg-white/60 rounded-lg border border-blue-200">
+            <p className="text-sm text-blue-800">
+              <strong>💡 Tips:</strong> File Excel yang dihasilkan sangat cocok untuk laporan KKN ke dosen pembimbing 
+              atau untuk dokumentasi resmi karena format yang professional dan lengkap.
+            </p>
           </div>
         </CardContent>
       </Card>
