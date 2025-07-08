@@ -11,16 +11,34 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { useApp } from "@/contexts/AppContext";
 import { useToast } from "@/hooks/use-toast";
 import { formatCurrency, formatDateTime } from "@/utils/formatters";
-import { Minus, Trash2, Calendar, User, Camera } from "lucide-react";
+import {
+  Minus,
+  Trash2,
+  Calendar,
+  User,
+  Camera,
+  MoreHorizontal,
+  CreditCard,
+  Receipt,
+} from "lucide-react";
 
 const ExpenseManagement = () => {
   const { transactions, programs, addTransaction, deleteTransaction, user } =
@@ -109,173 +127,239 @@ const ExpenseManagement = () => {
     const program = programs.find((p) => p.id === programId);
     return program ? program.name : "Umum";
   };
-
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">
-          Manajemen Pengeluaran
-        </h2>
-        {user?.role === "treasurer" && (
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-red-600 hover:bg-red-700">
-                <Minus className="mr-2 h-4 w-4" />
-                Tambah Pengeluaran
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Tambah Pengeluaran Baru</DialogTitle>
-              </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Jumlah (Rp)
-                  </label>
-                  <Input
-                    type="number"
-                    value={formData.amount}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        amount: e.target.value,
-                      }))
-                    }
-                    placeholder="0"
-                    required
-                  />
-                </div>
+    <div className="min-h-screen bg-gray-50 lg:bg-white">
+      {/* Mobile Header */}
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 lg:relative lg:bg-transparent lg:border-0">
+        <div className="px-4 py-4 lg:px-0 lg:py-6">
+          <div className="flex items-center justify-between">
+            {/* Title */}
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg font-semibold text-gray-900 truncate lg:text-2xl lg:font-bold">
+                Pengeluaran
+              </h1>
+              <p className="text-sm text-gray-500 lg:hidden">
+                {expenseTransactions.length} transaksi
+              </p>
+              <p className="hidden lg:block text-base text-gray-600 mt-1">
+                Manajemen Pengeluaran
+              </p>
+            </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Kategori
-                  </label>
-                  <Select
-                    value={formData.category}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, category: value }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih kategori" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {expenseCategories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+            {/* Action Buttons - Mobile & Desktop */}
+            <div className="flex items-center gap-2">
+              {user?.role === "treasurer" && (
+                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      size="sm"
+                      className="bg-red-600 hover:bg-red-700 lg:px-4"
+                    >
+                      <Minus className="h-4 w-4 lg:mr-2" />
+                      <span className="hidden lg:inline">Tambah Pengeluaran</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="mx-4 max-w-md lg:max-w-lg max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Tambah Pengeluaran Baru</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          Jumlah (Rp)
+                        </label>
+                        <Input
+                          type="number"
+                          value={formData.amount}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              amount: e.target.value,
+                            }))
+                          }
+                          placeholder="0"
+                          className="h-12 lg:h-10"
+                          required
+                        />
+                      </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Program Kerja (Opsional)
-                  </label>
-                  <Select
-                    value={formData.programId}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, programId: value }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Pilih program kerja" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="general">Umum</SelectItem>
-                      {programs.map((program) => (
-                        <SelectItem key={program.id} value={program.id}>
-                          {program.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          Deskripsi
+                        </label>
+                        <Textarea
+                          value={formData.description}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              description: e.target.value,
+                            }))
+                          }
+                          placeholder="Deskripsi pengeluaran..."
+                          className="min-h-[80px] resize-none lg:min-h-[60px]"
+                          required
+                        />
+                      </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Keterangan
-                  </label>
-                  <Textarea
-                    value={formData.description}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                    placeholder="Deskripsi pengeluaran..."
-                    required
-                  />
-                </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Tanggal
+                          </label>
+                          <Input
+                            type="date"
+                            value={formData.date}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                date: e.target.value,
+                              }))
+                            }
+                            className="text-base"
+                            required
+                          />
+                        </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Tanggal
-                    </label>
-                    <Input
-                      type="date"
-                      value={formData.date}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          date: e.target.value,
-                        }))
-                      }
-                      className="text-base"
-                      required
-                    />
+                        <div>
+                          <label className="block text-sm font-medium mb-2">
+                            Waktu
+                          </label>
+                          <Input
+                            type="time"
+                            value={formData.time}
+                            onChange={(e) =>
+                              setFormData((prev) => ({
+                                ...prev,
+                                time: e.target.value,
+                              }))
+                            }
+                            className="text-base"
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          Kategori
+                        </label>
+                        <Select
+                          value={formData.category}
+                          onValueChange={(value) =>
+                            setFormData((prev) => ({ ...prev, category: value }))
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih kategori" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {expenseCategories.map((category) => (
+                              <SelectItem key={category} value={category}>
+                                {category}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          Program Kerja (Opsional)
+                        </label>
+                        <Select
+                          value={formData.programId}
+                          onValueChange={(value) =>
+                            setFormData((prev) => ({ ...prev, programId: value }))
+                          }
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Pilih program kerja" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="general">Umum</SelectItem>
+                            {programs.map((program) => (
+                              <SelectItem key={program.id} value={program.id}>
+                                {program.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2">
+                          Bukti Transaksi (Opsional)
+                        </label>
+                        <Input
+                          type="text"
+                          value={formData.receipt}
+                          onChange={(e) =>
+                            setFormData((prev) => ({
+                              ...prev,
+                              receipt: e.target.value,
+                            }))
+                          }
+                          placeholder="URL atau keterangan bukti"
+                        />
+                      </div>
+
+                      <div className="flex space-x-2 pt-2">
+                        <Button type="submit" className="flex-1 h-12 lg:h-10">
+                          Simpan Pengeluaran
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={resetForm}
+                          className="h-12 lg:h-10"
+                        >
+                          Batal
+                        </Button>
+                      </div>
+                    </form>
+                  </DialogContent>
+                </Dialog>
+              )}
+
+              {/* More Actions - Mobile Only */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm" className="p-2 lg:hidden">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="bottom" className="h-[40vh]">
+                  <SheetHeader className="pb-4">
+                    <SheetTitle>Aksi Pengeluaran</SheetTitle>
+                    <SheetDescription>
+                      Kelola data pengeluaran dan transaksi
+                    </SheetDescription>
+                  </SheetHeader>
+                  <div className="space-y-3">
+                    {user?.role === "treasurer" && (
+                      <Button
+                        onClick={() => setIsDialogOpen(true)}
+                        variant="outline"
+                        className="w-full h-12 text-base justify-start"
+                      >
+                        <Minus className="mr-3 h-5 w-5 text-red-600" />
+                        Tambah Pengeluaran Baru
+                      </Button>
+                    )}
+                    <div className="text-sm text-gray-500 pt-2">
+                      Total {expenseTransactions.length} transaksi pengeluaran
+                    </div>
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Waktu
-                    </label>
-                    <Input
-                      type="time"
-                      value={formData.time}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          time: e.target.value,
-                        }))
-                      }
-                      className="text-base"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2">
-                    Bukti Transaksi (Opsional)
-                  </label>
-                  <Input
-                    type="text"
-                    value={formData.receipt}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        receipt: e.target.value,
-                      }))
-                    }
-                    placeholder="URL atau keterangan bukti"
-                  />
-                </div>
-
-                <Button type="submit" className="w-full">
-                  Simpan Pengeluaran
-                </Button>
-              </form>
-            </DialogContent>
-          </Dialog>
-        )}
+                </SheetContent>
+              </Sheet>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-4">
+      {/* Main Content */}
+      <div className="px-4 pb-4 space-y-4 lg:px-0 lg:pb-0 lg:space-y-6">
+        {/* Enhanced mobile-optimized expense list with badges and compact layout */}
         {expenseTransactions.length === 0 ? (
           <Card>
             <CardContent className="p-8 text-center">

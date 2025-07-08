@@ -141,7 +141,7 @@ const ProgramManagement = () => {
                 Manajemen Program Kerja
               </p>
             </div>
-            
+
             {/* Action Buttons - Mobile */}
             <div className="flex items-center gap-2 lg:hidden">
               {canEdit && (
@@ -149,8 +149,8 @@ const ProgramManagement = () => {
                   {/* Add Program - Mobile */}
                   <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button 
-                        size="sm" 
+                      <Button
+                        size="sm"
                         className="bg-purple-600 hover:bg-purple-700 p-2"
                         onClick={() => setEditingProgram(null)}
                       >
@@ -172,7 +172,10 @@ const ProgramManagement = () => {
                             type="text"
                             value={formData.name}
                             onChange={(e) =>
-                              setFormData((prev) => ({ ...prev, name: e.target.value }))
+                              setFormData((prev) => ({
+                                ...prev,
+                                name: e.target.value,
+                              }))
                             }
                             placeholder="Nama program kerja"
                             className="h-12"
@@ -219,9 +222,16 @@ const ProgramManagement = () => {
 
                         <div className="flex space-x-2 pt-2">
                           <Button type="submit" className="flex-1 h-12">
-                            {editingProgram ? "Update Program" : "Simpan Program"}
+                            {editingProgram
+                              ? "Update Program"
+                              : "Simpan Program"}
                           </Button>
-                          <Button type="button" variant="outline" onClick={resetForm} className="h-12">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            onClick={resetForm}
+                            className="h-12"
+                          >
                             Batal
                           </Button>
                         </div>
@@ -230,7 +240,7 @@ const ProgramManagement = () => {
                   </Dialog>
                 </>
               )}
-              
+
               {/* More Actions - Mobile */}
               <Sheet>
                 <SheetTrigger asChild>
@@ -266,7 +276,7 @@ const ProgramManagement = () => {
                 </SheetContent>
               </Sheet>
             </div>
-            
+
             {/* Desktop Add Button */}
             {canEdit && (
               <div className="hidden lg:block">
@@ -283,7 +293,9 @@ const ProgramManagement = () => {
                   <DialogContent>
                     <DialogHeader>
                       <DialogTitle>
-                        {editingProgram ? "Edit Program Kerja" : "Tambah Program Kerja Baru"}
+                        {editingProgram
+                          ? "Edit Program Kerja"
+                          : "Tambah Program Kerja Baru"}
                       </DialogTitle>
                     </DialogHeader>
                     <form onSubmit={handleSubmit} className="space-y-4">
@@ -295,7 +307,10 @@ const ProgramManagement = () => {
                           type="text"
                           value={formData.name}
                           onChange={(e) =>
-                            setFormData((prev) => ({ ...prev, name: e.target.value }))
+                            setFormData((prev) => ({
+                              ...prev,
+                              name: e.target.value,
+                            }))
                           }
                           placeholder="Nama program kerja"
                           required
@@ -341,7 +356,11 @@ const ProgramManagement = () => {
                         <Button type="submit" className="flex-1">
                           {editingProgram ? "Update Program" : "Simpan Program"}
                         </Button>
-                        <Button type="button" variant="outline" onClick={resetForm}>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={resetForm}
+                        >
                           Batal
                         </Button>
                       </div>
@@ -356,7 +375,6 @@ const ProgramManagement = () => {
 
       {/* Main Content */}
       <div className="px-4 pb-4 space-y-4 lg:px-0 lg:pb-0 lg:space-y-6">
-
         {/* Program Cards */}
         <div className="space-y-3 lg:space-y-4">
           {programs.length === 0 ? (
@@ -367,7 +385,9 @@ const ProgramManagement = () => {
                     <Target className="h-8 w-8 text-gray-400" />
                   </div>
                   <div>
-                    <p className="text-gray-500 font-medium">Belum ada program kerja</p>
+                    <p className="text-gray-500 font-medium">
+                      Belum ada program kerja
+                    </p>
                     <p className="text-sm text-gray-400 mt-1">
                       Mulai dengan menambahkan program kerja pertama
                     </p>
@@ -404,7 +424,7 @@ const ProgramManagement = () => {
                     bgColor: "bg-red-50",
                     textColor: "text-red-700",
                     icon: AlertTriangle,
-                    progressColor: "bg-red-500"
+                    progressColor: "bg-red-500",
                   };
                 } else if (percentage > 80) {
                   return {
@@ -413,7 +433,7 @@ const ProgramManagement = () => {
                     bgColor: "bg-orange-50",
                     textColor: "text-orange-700",
                     icon: AlertTriangle,
-                    progressColor: "bg-orange-500"
+                    progressColor: "bg-orange-500",
                   };
                 } else if (percentage > 50) {
                   return {
@@ -422,7 +442,7 @@ const ProgramManagement = () => {
                     bgColor: "bg-blue-50",
                     textColor: "text-blue-700",
                     icon: TrendingUp,
-                    progressColor: "bg-blue-500"
+                    progressColor: "bg-blue-500",
                   };
                 } else {
                   return {
@@ -431,14 +451,15 @@ const ProgramManagement = () => {
                     bgColor: "bg-green-50",
                     textColor: "text-green-700",
                     icon: CheckCircle,
-                    progressColor: "bg-green-500"
+                    progressColor: "bg-green-500",
                   };
                 }
               };
 
               const statusInfo = getStatusInfo(percentage);
               const StatusIcon = statusInfo.icon;
-              const remainingBudget = program.allocatedBudget - program.usedBudget;
+              const remainingBudget =
+                program.allocatedBudget - program.usedBudget;
 
               return (
                 <Card
@@ -461,7 +482,11 @@ const ProgramManagement = () => {
                         {canEdit && (
                           <Sheet>
                             <SheetTrigger asChild>
-                              <Button variant="ghost" size="sm" className="p-1.5 ml-2 flex-shrink-0">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="p-1.5 ml-2 flex-shrink-0"
+                              >
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </SheetTrigger>
@@ -497,8 +522,8 @@ const ProgramManagement = () => {
 
                       {/* Status Badge */}
                       <div className="flex items-center gap-2 mb-3">
-                        <Badge 
-                          variant="secondary" 
+                        <Badge
+                          variant="secondary"
                           className={`${statusInfo.bgColor} ${statusInfo.textColor} border-0 px-2 py-1`}
                         >
                           <StatusIcon className="h-3 w-3 mr-1" />
@@ -516,12 +541,16 @@ const ProgramManagement = () => {
                           className="h-2"
                           style={{
                             // @ts-ignore
-                            '--progress-background': statusInfo.progressColor,
+                            "--progress-background": statusInfo.progressColor,
                           }}
                         />
                         <div className="flex justify-between text-xs text-gray-600">
-                          <span>Terpakai: {formatCurrency(program.usedBudget)}</span>
-                          <span>Alokasi: {formatCurrency(program.allocatedBudget)}</span>
+                          <span>
+                            Terpakai: {formatCurrency(program.usedBudget)}
+                          </span>
+                          <span>
+                            Alokasi: {formatCurrency(program.allocatedBudget)}
+                          </span>
                         </div>
                       </div>
 
@@ -584,7 +613,8 @@ const ProgramManagement = () => {
                                 Terpakai: {formatCurrency(program.usedBudget)}
                               </span>
                               <span>
-                                Alokasi: {formatCurrency(program.allocatedBudget)}
+                                Alokasi:{" "}
+                                {formatCurrency(program.allocatedBudget)}
                               </span>
                             </div>
                           </div>
