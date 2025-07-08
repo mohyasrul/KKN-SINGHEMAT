@@ -1,14 +1,15 @@
-import * as XLSX from 'xlsx';
-import { saveAs } from 'file-saver';
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 export interface Transaction {
   id: string;
-  type: 'income' | 'expense';
+  type: "income" | "expense";
   amount: number;
   description: string;
   date: string;
   programId?: string;
   category?: string;
+  createdBy?: string;
 }
 
 export interface Program {
@@ -29,49 +30,221 @@ interface ExcelExportData {
   };
 }
 
+// Define color constants for consistent styling
+const COLORS = {
+  primary: 'FF2563EB',      // Blue
+  success: 'FF10B981',      // Green
+  danger: 'FFEF4444',       // Red
+  warning: 'FFF59E0B',      // Yellow
+  secondary: 'FF6B7280',    // Gray
+  light: 'FFF3F4F6',        // Light Gray
+  white: 'FFFFFFFF',        // White
+  dark: 'FF1F2937',         // Dark Gray
+  purple: 'FF8B5CF6',       // Purple
+  orange: 'FFF97316',       // Orange
+};
+
+// Helper function to create styled cell
+const createStyledCell = (value: any, style?: any) => {
+  return {
+    v: value,
+    s: style
+  };
+};
+
+// Helper function to create header style
+const getHeaderStyle = (bgColor: string = COLORS.primary) => ({
+  font: { 
+    bold: true, 
+    color: { rgb: COLORS.white },
+    size: 12,
+    name: 'Calibri'
+  },
+  fill: { 
+    fgColor: { rgb: bgColor },
+    patternType: 'solid'
+  },
+  alignment: { 
+    horizontal: 'center',
+    vertical: 'center',
+    wrapText: true
+  },
+  border: {
+    top: { style: 'thin', color: { rgb: COLORS.dark } },
+    bottom: { style: 'thin', color: { rgb: COLORS.dark } },
+    left: { style: 'thin', color: { rgb: COLORS.dark } },
+    right: { style: 'thin', color: { rgb: COLORS.dark } }
+  }
+});
+
+// Helper function to create data style
+const getDataStyle = (textColor?: string, bgColor?: string, bold?: boolean) => ({
+  font: { 
+    color: textColor ? { rgb: textColor } : { rgb: COLORS.dark },
+    bold: bold || false,
+    size: 11,
+    name: 'Calibri'
+  },
+  fill: bgColor ? { 
+    fgColor: { rgb: bgColor },
+    patternType: 'solid'
+  } : undefined,
+  alignment: { 
+    vertical: 'center',
+    wrapText: true
+  },
+  border: {
+    top: { style: 'thin', color: { rgb: COLORS.secondary } },
+    bottom: { style: 'thin', color: { rgb: COLORS.secondary } },
+    left: { style: 'thin', color: { rgb: COLORS.secondary } },
+    right: { style: 'thin', color: { rgb: COLORS.secondary } }
+  }
+});
+
+// Helper function to create currency style
+const getCurrencyStyle = (color: string, bold?: boolean) => ({
+  ...getDataStyle(color, undefined, bold),
+  numFmt: '"Rp "#,##0'
+});
+
+// Helper function to create title style
+const getTitleStyle = () => ({
+  font: { 
+    bold: true, 
+    size: 16,
+    color: { rgb: COLORS.primary },
+    name: 'Calibri'
+  },
+  alignment: { 
+    horizontal: 'center',
+    vertical: 'center'
+  }
+});
+
+// Helper function to create section header style
+const getSectionHeaderStyle = () => ({
+  font: { 
+    bold: true, 
+    size: 14,
+    color: { rgb: COLORS.white },
+    name: 'Calibri'
+  },
+  fill: { 
+    fgColor: { rgb: COLORS.dark },
+    patternType: 'solid'
+  },
+  alignment: { 
+    horizontal: 'center',
+    vertical: 'center'
+  },
+  border: {
+    top: { style: 'medium', color: { rgb: COLORS.dark } },
+    bottom: { style: 'medium', color: { rgb: COLORS.dark } },
+    left: { style: 'medium', color: { rgb: COLORS.dark } },
+    right: { style: 'medium', color: { rgb: COLORS.dark } }
+  }
+});
+
 export const exportToExcel = (data: ExcelExportData, filename?: string) => {
   try {
     // Create new workbook
     const workbook = XLSX.utils.book_new();
+    
+    // Set workbook properties
+    workbook.Props = {
+      Title: 'KKN Budget Nexus - Laporan Keuangan',
+      Subject: 'Financial Report',
+      Author: 'KKN Budget Nexus System',
+      CreatedDate: new Date()
+    };
 
-    // 1. SUMMARY SHEET
+    // 1. ENHANCED SUMMARY SHEET
     const summaryData = [
-      ['KKN BUDGET NEXUS - LAPORAN KEUANGAN'],
-      ['Tanggal Export:', new Date().toLocaleDateString('id-ID', {
+      [createStyledCell('KKN BUDGET NEXUS', getTitleStyle())],
+      [createStyledCell('LAPORAN KEUANGAN KOMPREHENSIF', getTitleStyle())],
+      [''],
+      [createStyledCell(`📅 Tanggal Export: ${new Date().toLocaleDateString('id-ID', {
         weekday: 'long',
         year: 'numeric',
-        month: 'long',
+        month: 'long', 
         day: 'numeric'
-      })],
-      ['Jam:', new Date().toLocaleTimeString('id-ID')],
+      })}`, getDataStyle(COLORS.secondary))],
+      [createStyledCell(`🕐 Jam: ${new Date().toLocaleTimeString('id-ID')}`, getDataStyle(COLORS.secondary))],
       [''],
-      ['RINGKASAN KEUANGAN'],
-      ['Total Pemasukan:', formatCurrency(data.summary.totalIncome)],
-      ['Total Pengeluaran:', formatCurrency(data.summary.totalExpense)],
-      ['Saldo:', formatCurrency(data.summary.balance)],
-      ['Jumlah Program:', data.summary.programCount],
-      ['Jumlah Transaksi:', data.transactions.length],
+      
+      // Financial Summary Section
+      [createStyledCell('💰 RINGKASAN KEUANGAN', getSectionHeaderStyle())],
+      [
+        createStyledCell('Kategori', getHeaderStyle(COLORS.secondary)),
+        createStyledCell('Jumlah', getHeaderStyle(COLORS.secondary))
+      ],
+      [
+        createStyledCell('📈 Total Pemasukan', getDataStyle()),
+        createStyledCell(data.summary.totalIncome, getCurrencyStyle(COLORS.success, true))
+      ],
+      [
+        createStyledCell('📉 Total Pengeluaran', getDataStyle()),
+        createStyledCell(data.summary.totalExpense, getCurrencyStyle(COLORS.danger, true))
+      ],
+      [
+        createStyledCell('💵 SALDO AKHIR', getDataStyle(COLORS.dark, COLORS.light, true)),
+        createStyledCell(data.summary.balance, getCurrencyStyle(
+          data.summary.balance >= 0 ? COLORS.success : COLORS.danger, true
+        ))
+      ],
+      [
+        createStyledCell('🎯 Jumlah Program Aktif', getDataStyle()),
+        createStyledCell(data.summary.programCount, getDataStyle(COLORS.primary, undefined, true))
+      ],
+      [
+        createStyledCell('📊 Total Transaksi', getDataStyle()),
+        createStyledCell(data.transactions.length, getDataStyle(COLORS.primary, undefined, true))
+      ],
       [''],
-      ['STATUS KEUANGAN'],
-      [data.summary.balance >= 0 ? 'SURPLUS' : 'DEFISIT', formatCurrency(Math.abs(data.summary.balance))]
+      
+      // Status Section
+      [createStyledCell('📋 STATUS KEUANGAN', getSectionHeaderStyle())],
+      [
+        createStyledCell('Status Keuangan', getDataStyle()),
+        createStyledCell(
+          data.summary.balance >= 0 ? '✅ SURPLUS' : '⚠️ DEFISIT',
+          getDataStyle(data.summary.balance >= 0 ? COLORS.success : COLORS.danger, 
+          data.summary.balance >= 0 ? 'FFF0FDF4' : 'FFFEF2F2', true)
+        )
+      ],
+      [
+        createStyledCell('Nilai Absolut', getDataStyle()),
+        createStyledCell(Math.abs(data.summary.balance), getCurrencyStyle(
+          data.summary.balance >= 0 ? COLORS.success : COLORS.danger, true))
+      ]
     ];
-    
+
     const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
     
-    // Style the summary sheet
-    summarySheet['!cols'] = [{ width: 25 }, { width: 25 }];
+    // Set column widths for summary
+    summarySheet['!cols'] = [
+      { width: 35 }, // Kategori
+      { width: 25 }  // Jumlah
+    ];
     
-    XLSX.utils.book_append_sheet(workbook, summarySheet, 'Ringkasan');
+    // Merge cells for titles
+    summarySheet['!merges'] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 1 } }, // Title
+      { s: { r: 1, c: 0 }, e: { r: 1, c: 1 } }, // Subtitle
+      { s: { r: 6, c: 0 }, e: { r: 6, c: 1 } }, // Financial header
+      { s: { r: 13, c: 0 }, e: { r: 13, c: 1 } }, // Status header
+    ];
 
-    // 2. TRANSACTIONS SHEET
+    XLSX.utils.book_append_sheet(workbook, summarySheet, '📊 Ringkasan');    // 2. ENHANCED TRANSACTIONS SHEET
     const transactionHeaders = [
-      'No',
-      'Tanggal',
-      'Deskripsi',
-      'Tipe',
-      'Jumlah (Rp)',
-      'Program',
-      'Kategori'
+      createStyledCell('No', getHeaderStyle()),
+      createStyledCell('📅 Tanggal', getHeaderStyle()),
+      createStyledCell('📝 Deskripsi', getHeaderStyle()),
+      createStyledCell('🔄 Tipe', getHeaderStyle()),
+      createStyledCell('💰 Jumlah (Rp)', getHeaderStyle()),
+      createStyledCell('🎯 Program', getHeaderStyle()),
+      createStyledCell('🏷️ Kategori', getHeaderStyle()),
+      createStyledCell('👤 Dibuat Oleh', getHeaderStyle())
     ];
 
     // Sort transactions by date
@@ -79,176 +252,339 @@ export const exportToExcel = (data: ExcelExportData, filename?: string) => {
       (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
 
-    const transactionData = sortedTransactions.map((transaction, index) => {
-      const programName = data.programs.find(p => p.id === transaction.programId)?.name || '-';
-      
-      return [
-        index + 1,
-        new Date(transaction.date).toLocaleDateString('id-ID'),
-        transaction.description,
-        transaction.type === 'income' ? 'Pemasukan' : 'Pengeluaran',
-        transaction.amount,
-        programName,
-        transaction.category || '-'
-      ];
-    });
-
-    const totalIncome = data.transactions
-      .filter(t => t.type === 'income')
-      .reduce((sum, t) => sum + t.amount, 0);
-    
-    const totalExpense = data.transactions
-      .filter(t => t.type === 'expense')
-      .reduce((sum, t) => sum + t.amount, 0);
-
-    const transactionSheet = XLSX.utils.aoa_to_sheet([
-      ['DETAIL TRANSAKSI KEUANGAN'],
-      ['Total Transaksi:', data.transactions.length],
+    const transactionData = [
+      [createStyledCell('💰 DETAIL TRANSAKSI KEUANGAN', getTitleStyle())],
+      [createStyledCell(`📊 Total Transaksi: ${data.transactions.length}`, getDataStyle(COLORS.secondary))],
       [''],
       transactionHeaders,
-      ...transactionData,
-      [''],
-      ['TOTAL PEMASUKAN:', '', '', '', totalIncome],
-      ['TOTAL PENGELUARAN:', '', '', '', totalExpense],
-      ['SALDO AKHIR:', '', '', '', totalIncome - totalExpense]
-    ]);
+      ...sortedTransactions.map((transaction, index) => {
+        const programName = data.programs.find(p => p.id === transaction.programId)?.name || 'Umum';
+        
+        return [
+          createStyledCell(index + 1, getDataStyle()),
+          createStyledCell(new Date(transaction.date).toLocaleDateString('id-ID'), getDataStyle()),
+          createStyledCell(transaction.description, getDataStyle()),
+          createStyledCell(
+            transaction.type === 'income' ? '📈 Pemasukan' : '📉 Pengeluaran',
+            getDataStyle(transaction.type === 'income' ? COLORS.success : COLORS.danger, undefined, true)
+          ),
+          createStyledCell(
+            transaction.amount,
+            getCurrencyStyle(transaction.type === 'income' ? COLORS.success : COLORS.danger, true)
+          ),
+          createStyledCell(programName, getDataStyle()),
+          createStyledCell(transaction.category || '-', getDataStyle()),
+          createStyledCell(transaction.createdBy || 'System', getDataStyle(COLORS.secondary))
+        ];
+      }),
+      [''], // Empty row
+      
+      // Summary rows with enhanced styling
+      [
+        '', '', '', 
+        createStyledCell('📈 TOTAL PEMASUKAN', getDataStyle(COLORS.success, 'FFF0FDF4', true)),
+        createStyledCell(
+          data.transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0),
+          getCurrencyStyle(COLORS.success, true)
+        ),
+        '', '', ''
+      ],
+      [
+        '', '', '',
+        createStyledCell('📉 TOTAL PENGELUARAN', getDataStyle(COLORS.danger, 'FFFEF2F2', true)),
+        createStyledCell(
+          data.transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0),
+          getCurrencyStyle(COLORS.danger, true)
+        ),
+        '', '', ''
+      ],
+      [
+        '', '', '',
+        createStyledCell('💵 SALDO AKHIR', getDataStyle(COLORS.primary, COLORS.light, true)),
+        createStyledCell(
+          data.summary.balance,
+          getCurrencyStyle(data.summary.balance >= 0 ? COLORS.success : COLORS.danger, true)
+        ),
+        '', '', ''
+      ]
+    ];
+
+    const transactionSheet = XLSX.utils.aoa_to_sheet(transactionData);
 
     // Set column widths for transactions
     transactionSheet['!cols'] = [
-      { width: 5 },   // No
-      { width: 12 },  // Tanggal
-      { width: 30 },  // Deskripsi
-      { width: 12 },  // Tipe
-      { width: 15 },  // Jumlah
-      { width: 20 },  // Program
-      { width: 15 }   // Kategori
+      { width: 8 },   // No
+      { width: 15 },  // Tanggal
+      { width: 45 },  // Deskripsi (lebih lebar)
+      { width: 18 },  // Tipe
+      { width: 18 },  // Jumlah
+      { width: 25 },  // Program (lebih lebar)
+      { width: 20 },  // Kategori
+      { width: 15 }   // Dibuat Oleh
     ];
 
-    XLSX.utils.book_append_sheet(workbook, transactionSheet, 'Transaksi');
+    // Merge title cell
+    transactionSheet['!merges'] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } }
+    ];
 
-    // 3. PROGRAMS SHEET
+    XLSX.utils.book_append_sheet(workbook, transactionSheet, '💰 Transaksi');    // 3. ENHANCED PROGRAMS SHEET
     const programHeaders = [
-      'No',
-      'Nama Program',
-      'Anggaran Dialokasikan (Rp)',
-      'Total Pengeluaran (Rp)',
-      'Sisa Anggaran (Rp)',
-      'Status',
-      'Persentase Terpakai (%)'
+      createStyledCell('No', getHeaderStyle()),
+      createStyledCell('🎯 Nama Program', getHeaderStyle()),
+      createStyledCell('💰 Anggaran (Rp)', getHeaderStyle()),
+      createStyledCell('📉 Terpakai (Rp)', getHeaderStyle()),
+      createStyledCell('💵 Sisa (Rp)', getHeaderStyle()),
+      createStyledCell('📊 Progress %', getHeaderStyle()),
+      createStyledCell('⚡ Status', getHeaderStyle()),
+      createStyledCell('📝 Transaksi', getHeaderStyle())
     ];
 
-    const programData = data.programs.map((program, index) => {
-      const totalExpenses = data.transactions
-        .filter(t => t.type === 'expense' && t.programId === program.id)
-        .reduce((sum, t) => sum + t.amount, 0);
-      
-      const remaining = program.allocatedBudget - totalExpenses;
-      const percentage = program.allocatedBudget > 0 ? 
-        ((totalExpenses / program.allocatedBudget) * 100).toFixed(1) : '0';
-      
-      const status = remaining >= 0 ? 'Dalam Anggaran' : 'Melebihi Anggaran';
-
-      return [
-        index + 1,
-        program.name,
-        program.allocatedBudget,
-        totalExpenses,
-        remaining,
-        status,
-        parseFloat(percentage)
-      ];
-    });
-
-    const totalAllocated = data.programs.reduce((sum, p) => sum + p.allocatedBudget, 0);
-    const totalUsed = data.programs.reduce((sum, p) => {
-      return sum + data.transactions
-        .filter(t => t.type === 'expense' && t.programId === p.id)
-        .reduce((acc, t) => acc + t.amount, 0);
-    }, 0);
-
-    const programSheet = XLSX.utils.aoa_to_sheet([
-      ['LAPORAN PROGRAM KKN'],
-      ['Jumlah Program:', data.programs.length],
+    const programData = [
+      [createStyledCell('🎯 LAPORAN PROGRAM KERJA KKN', getTitleStyle())],
+      [createStyledCell(`📊 Jumlah Program: ${data.programs.length}`, getDataStyle(COLORS.secondary))],
       [''],
       programHeaders,
-      ...programData,
-      [''],
-      ['TOTAL ALOKASI:', '', totalAllocated],
-      ['TOTAL TERPAKAI:', '', '', totalUsed],
-      ['SISA TOTAL:', '', '', '', totalAllocated - totalUsed]
-    ]);
+      ...data.programs.map((program, index) => {
+        const totalExpenses = data.transactions
+          .filter(t => t.type === 'expense' && t.programId === program.id)
+          .reduce((sum, t) => sum + t.amount, 0);
+        
+        const remaining = program.allocatedBudget - totalExpenses;
+        const percentage = program.allocatedBudget > 0 ? 
+          (totalExpenses / program.allocatedBudget) * 100 : 0;
+        
+        let status, statusColor, statusBg;
+        if (percentage > 100) {
+          status = '🚨 Over Budget';
+          statusColor = COLORS.white;
+          statusBg = COLORS.danger;
+        } else if (percentage > 80) {
+          status = '⚠️ Hampir Habis';
+          statusColor = COLORS.dark;
+          statusBg = 'FFFEF3C7'; // Yellow background
+        } else {
+          status = '✅ Aman';
+          statusColor = COLORS.white;
+          statusBg = COLORS.success;
+        }
+
+        const transactionCount = data.transactions
+          .filter(t => t.type === 'expense' && t.programId === program.id).length;
+
+        return [
+          createStyledCell(index + 1, getDataStyle()),
+          createStyledCell(program.name, getDataStyle(COLORS.dark, undefined, true)),
+          createStyledCell(program.allocatedBudget, getCurrencyStyle(COLORS.primary)),
+          createStyledCell(totalExpenses, getCurrencyStyle(COLORS.danger)),
+          createStyledCell(remaining, getCurrencyStyle(remaining >= 0 ? COLORS.success : COLORS.danger, true)),
+          createStyledCell(`${percentage.toFixed(1)}%`, getDataStyle(
+            percentage > 100 ? COLORS.danger : percentage > 80 ? COLORS.warning : COLORS.success, 
+            undefined, true)
+          ),
+          createStyledCell(status, getDataStyle(statusColor, statusBg, true)),
+          createStyledCell(transactionCount, getDataStyle())
+        ];
+      }),
+      [''], // Empty row
+      
+      // Summary totals
+      [
+        '', 
+        createStyledCell('📊 TOTAL KESELURUHAN', getDataStyle(COLORS.primary, COLORS.light, true)),
+        createStyledCell(
+          data.programs.reduce((sum, p) => sum + p.allocatedBudget, 0),
+          getCurrencyStyle(COLORS.primary, true)
+        ),
+        createStyledCell(
+          data.programs.reduce((sum, p) => {
+            return sum + data.transactions
+              .filter(t => t.type === 'expense' && t.programId === p.id)
+              .reduce((acc, t) => acc + t.amount, 0);
+          }, 0),
+          getCurrencyStyle(COLORS.danger, true)
+        ),
+        createStyledCell(
+          data.programs.reduce((sum, p) => sum + p.allocatedBudget, 0) -
+          data.programs.reduce((sum, p) => {
+            return sum + data.transactions
+              .filter(t => t.type === 'expense' && t.programId === p.id)
+              .reduce((acc, t) => acc + t.amount, 0);
+          }, 0),
+          getCurrencyStyle(COLORS.success, true)
+        ),
+        '', '', ''
+      ]
+    ];
+
+    const programSheet = XLSX.utils.aoa_to_sheet(programData);
 
     // Set column widths for programs
     programSheet['!cols'] = [
-      { width: 5 },   // No
-      { width: 25 },  // Nama Program
-      { width: 20 },  // Anggaran
-      { width: 20 },  // Pengeluaran
+      { width: 8 },   // No
+      { width: 35 },  // Nama Program (lebih lebar)
+      { width: 18 },  // Anggaran
+      { width: 18 },  // Terpakai
       { width: 18 },  // Sisa
-      { width: 18 },  // Status
-      { width: 18 }   // Persentase
+      { width: 15 },  // Progress
+      { width: 20 },  // Status (lebih lebar)
+      { width: 12 }   // Transaksi
     ];
 
-    XLSX.utils.book_append_sheet(workbook, programSheet, 'Program');
+    // Merge title cells
+    programSheet['!merges'] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 7 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: 7 } }
+    ];
 
-    // 4. MONTHLY ANALYSIS SHEET
-    const monthlyData = getMonthlyAnalysis(data.transactions);
-    const monthlyHeaders = ['Bulan', 'Pemasukan (Rp)', 'Pengeluaran (Rp)', 'Net (Rp)', 'Kumulatif (Rp)'];
+    XLSX.utils.book_append_sheet(workbook, programSheet, '🎯 Program');    // 4. ENHANCED MONTHLY ANALYSIS SHEET
+    const monthlyData = getEnhancedMonthlyAnalysis(data.transactions);
     
-    const monthlySheet = XLSX.utils.aoa_to_sheet([
-      ['ANALISIS BULANAN'],
-      ['Periode:', monthlyData.length > 0 ? `${monthlyData[0][0]} - ${monthlyData[monthlyData.length - 1][0]}` : 'Tidak ada data'],
+    const monthlyHeaders = [
+      createStyledCell('📅 Bulan', getHeaderStyle()),
+      createStyledCell('📈 Pemasukan (Rp)', getHeaderStyle(COLORS.success)),
+      createStyledCell('📉 Pengeluaran (Rp)', getHeaderStyle(COLORS.danger)),
+      createStyledCell('💰 Net Cash Flow (Rp)', getHeaderStyle(COLORS.primary)),
+      createStyledCell('🏦 Saldo Berjalan (Rp)', getHeaderStyle(COLORS.warning))
+    ];
+
+    const monthlySheetData = [
+      [createStyledCell('📈 ANALISIS KEUANGAN BULANAN', getTitleStyle())],
+      [createStyledCell(
+        `📊 Periode: ${monthlyData.length > 0 ? 
+          `${monthlyData[0].month} - ${monthlyData[monthlyData.length - 1].month}` : 
+          'Tidak ada data'}`, 
+        getDataStyle(COLORS.secondary)
+      )],
       [''],
       monthlyHeaders,
-      ...monthlyData.map(row => [
-        row[0], // Month
-        row[1], // Income (as number)
-        row[2], // Expense (as number)
-        row[3], // Net (as number)
-        row[4]  // Cumulative (as number)
-      ])
-    ]);
-
-    monthlySheet['!cols'] = [
-      { width: 15 }, // Bulan
-      { width: 18 }, // Pemasukan
-      { width: 18 }, // Pengeluaran
-      { width: 18 }, // Net
-      { width: 18 }  // Kumulatif
+      ...monthlyData.map(data => [
+        createStyledCell(data.month, getDataStyle(COLORS.dark, undefined, true)),
+        createStyledCell(data.income, getCurrencyStyle(COLORS.success)),
+        createStyledCell(data.expense, getCurrencyStyle(COLORS.danger)),
+        createStyledCell(data.net, getCurrencyStyle(data.net >= 0 ? COLORS.success : COLORS.danger, true)),
+        createStyledCell(data.runningBalance, getCurrencyStyle(data.runningBalance >= 0 ? COLORS.success : COLORS.danger, true))
+      ]),
+      [''], // Empty row
+      
+      // Monthly analysis summary
+      [
+        createStyledCell('📊 RINGKASAN ANALISIS', getDataStyle(COLORS.primary, COLORS.light, true)),
+        createStyledCell(
+          monthlyData.length > 0 ? monthlyData.reduce((sum, d) => sum + d.income, 0) : 0,
+          getCurrencyStyle(COLORS.success, true)
+        ),
+        createStyledCell(
+          monthlyData.length > 0 ? monthlyData.reduce((sum, d) => sum + d.expense, 0) : 0,
+          getCurrencyStyle(COLORS.danger, true)
+        ),
+        createStyledCell(
+          monthlyData.length > 0 ? monthlyData.reduce((sum, d) => sum + d.net, 0) : 0,
+          getCurrencyStyle(COLORS.primary, true)
+        ),
+        createStyledCell(
+          monthlyData.length > 0 ? monthlyData[monthlyData.length - 1].runningBalance : 0,
+          getCurrencyStyle(COLORS.warning, true)
+        )
+      ]
     ];
-    
-    XLSX.utils.book_append_sheet(workbook, monthlySheet, 'Analisis Bulanan');
 
-    // 5. CATEGORY ANALYSIS SHEET (New)
-    const categoryData = getCategoryAnalysis(data.transactions);
-    const categoryHeaders = ['Kategori', 'Jumlah Transaksi', 'Total Pengeluaran (Rp)', 'Rata-rata (Rp)', 'Persentase (%)'];
+    const monthlySheet = XLSX.utils.aoa_to_sheet(monthlySheetData);
+
+    // Set column widths for monthly analysis
+    monthlySheet['!cols'] = [
+      { width: 20 }, // Bulan
+      { width: 20 }, // Pemasukan
+      { width: 20 }, // Pengeluaran
+      { width: 22 }, // Net Cash Flow
+      { width: 22 }  // Saldo Berjalan
+    ];
+
+    // Merge title cells
+    monthlySheet['!merges'] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 4 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: 4 } }
+    ];
+
+    XLSX.utils.book_append_sheet(workbook, monthlySheet, '📈 Analisis Bulanan');    // 5. ENHANCED CATEGORY ANALYSIS SHEET
+    const categoryAnalysis = getEnhancedCategoryAnalysis(data.transactions);
     
-    const categorySheet = XLSX.utils.aoa_to_sheet([
-      ['ANALISIS KATEGORI PENGELUARAN'],
+    const categoryHeaders = [
+      createStyledCell('🏷️ Kategori', getHeaderStyle()),
+      createStyledCell('📈 Pemasukan (Rp)', getHeaderStyle(COLORS.success)),
+      createStyledCell('📉 Pengeluaran (Rp)', getHeaderStyle(COLORS.danger)),
+      createStyledCell('💰 Net (Rp)', getHeaderStyle(COLORS.primary)),
+      createStyledCell('📊 % dari Total', getHeaderStyle(COLORS.warning)),
+      createStyledCell('📝 Transaksi', getHeaderStyle())
+    ];
+
+    const categorySheetData = [
+      [createStyledCell('📋 ANALISIS PER KATEGORI', getTitleStyle())],
+      [createStyledCell(`📊 Total Kategori: ${categoryAnalysis.length}`, getDataStyle(COLORS.secondary))],
       [''],
       categoryHeaders,
-      ...categoryData
-    ]);
-
-    categorySheet['!cols'] = [
-      { width: 20 }, // Kategori
-      { width: 18 }, // Jumlah
-      { width: 20 }, // Total
-      { width: 18 }, // Rata-rata
-      { width: 15 }  // Persentase
+      ...categoryAnalysis.map(data => [
+        createStyledCell(data.category, getDataStyle(COLORS.dark, undefined, true)),
+        createStyledCell(data.income, getCurrencyStyle(COLORS.success)),
+        createStyledCell(data.expense, getCurrencyStyle(COLORS.danger)),
+        createStyledCell(data.net, getCurrencyStyle(data.net >= 0 ? COLORS.success : COLORS.danger, true)),
+        createStyledCell(`${data.percentage}%`, getDataStyle(COLORS.primary, undefined, true)),
+        createStyledCell(data.transactionCount, getDataStyle())
+      ]),
+      [''], // Empty row
+      
+      // Category summary
+      [
+        createStyledCell('📊 TOTAL KATEGORI', getDataStyle(COLORS.primary, COLORS.light, true)),
+        createStyledCell(
+          categoryAnalysis.reduce((sum, c) => sum + c.income, 0),
+          getCurrencyStyle(COLORS.success, true)
+        ),
+        createStyledCell(
+          categoryAnalysis.reduce((sum, c) => sum + c.expense, 0),
+          getCurrencyStyle(COLORS.danger, true)
+        ),
+        createStyledCell(
+          categoryAnalysis.reduce((sum, c) => sum + c.net, 0),
+          getCurrencyStyle(COLORS.primary, true)
+        ),
+        createStyledCell('100%', getDataStyle(COLORS.primary, undefined, true)),
+        createStyledCell(
+          categoryAnalysis.reduce((sum, c) => sum + c.transactionCount, 0),
+          getDataStyle(COLORS.primary, undefined, true)
+        )
+      ]
     ];
 
-    XLSX.utils.book_append_sheet(workbook, categorySheet, 'Analisis Kategori');
+    const categorySheet = XLSX.utils.aoa_to_sheet(categorySheetData);
 
-    // Generate filename
+    // Set column widths for category analysis
+    categorySheet['!cols'] = [
+      { width: 30 }, // Kategori (lebih lebar)
+      { width: 20 }, // Pemasukan
+      { width: 20 }, // Pengeluaran
+      { width: 18 }, // Net
+      { width: 15 }, // Persentase
+      { width: 15 }  // Transaksi
+    ];
+
+    // Merge title cells
+    categorySheet['!merges'] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 5 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: 5 } }
+    ];
+
+    XLSX.utils.book_append_sheet(workbook, categorySheet, '📋 Kategori');
+
+    // Generate filename with timestamp
     const timestamp = new Date().toISOString().split('T')[0];
-    const fileName = filename || `KKN-Budget-Report-${timestamp}.xlsx`;
-
-    // Write and save file
+    const fileName = filename || `KKN-Budget-Report-Professional-${timestamp}.xlsx`;    // Write and save file with enhanced options
     const excelBuffer = XLSX.write(workbook, { 
       bookType: 'xlsx', 
       type: 'array',
-      cellStyles: true
+      cellStyles: true,
+      sheetStubs: false
     });
     
     const data_blob = new Blob([excelBuffer], { 
@@ -264,8 +600,8 @@ export const exportToExcel = (data: ExcelExportData, filename?: string) => {
   }
 };
 
-// Helper function for monthly analysis
-const getMonthlyAnalysis = (transactions: Transaction[]) => {
+// Enhanced helper function for monthly analysis with running balance
+const getEnhancedMonthlyAnalysis = (transactions: Transaction[]) => {
   const monthlyMap = new Map<string, { month: string; income: number; expense: number; }>();
   
   transactions.forEach(transaction => {
@@ -289,62 +625,73 @@ const getMonthlyAnalysis = (transactions: Transaction[]) => {
     }
   });
   
-  // Sort by month key and calculate cumulative
+  // Sort by month and calculate running balance
   const sortedData = Array.from(monthlyMap.entries())
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([, data]) => data);
-
-  let cumulative = 0;
+  
+  let runningBalance = 0;
+  
   return sortedData.map(data => {
     const net = data.income - data.expense;
-    cumulative += net;
+    runningBalance += net;
     
-    return [
-      data.month,
-      data.income,
-      data.expense,
-      net,
-      cumulative
-    ];
+    return {
+      month: data.month,
+      income: data.income,
+      expense: data.expense,
+      net: net,
+      runningBalance: runningBalance
+    };
   });
 };
 
-// Helper function for category analysis
-const getCategoryAnalysis = (transactions: Transaction[]) => {
-  const expenseTransactions = transactions.filter(t => t.type === 'expense');
-  const categoryMap = new Map<string, { count: number; total: number; }>();
+// Enhanced helper function for category analysis
+const getEnhancedCategoryAnalysis = (transactions: Transaction[]) => {
+  const categoryMap = new Map<string, { category: string; income: number; expense: number; transactionCount: number; }>();
+  const totalAmount = transactions.reduce((sum, t) => sum + t.amount, 0);
   
-  expenseTransactions.forEach(transaction => {
-    const category = transaction.category || 'Tidak Berkategori';
+  transactions.forEach(transaction => {
+    const category = transaction.category || 'Tidak Dikategorikan';
     
     if (!categoryMap.has(category)) {
-      categoryMap.set(category, { count: 0, total: 0 });
+      categoryMap.set(category, {
+        category,
+        income: 0,
+        expense: 0,
+        transactionCount: 0
+      });
     }
     
     const categoryData = categoryMap.get(category)!;
-    categoryData.count += 1;
-    categoryData.total += transaction.amount;
+    categoryData.transactionCount++;
+    
+    if (transaction.type === 'income') {
+      categoryData.income += transaction.amount;
+    } else {
+      categoryData.expense += transaction.amount;
+    }
   });
   
-  const totalExpenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
-  
-  return Array.from(categoryMap.entries())
-    .map(([category, data]) => [
-      category,
-      data.count,
-      data.total,
-      data.count > 0 ? data.total / data.count : 0,
-      totalExpenses > 0 ? ((data.total / totalExpenses) * 100).toFixed(1) : '0'
-    ])
-    .sort((a, b) => (b[2] as number) - (a[2] as number)); // Sort by total amount descending
+  return Array.from(categoryMap.values()).map(data => {
+    const net = data.income - data.expense;
+    const totalCategoryAmount = data.income + data.expense;
+    const percentage = totalAmount > 0 ? ((totalCategoryAmount / totalAmount) * 100).toFixed(1) : '0';
+    
+    return {
+      ...data,
+      net,
+      percentage
+    };
+  }).sort((a, b) => (b.income + b.expense) - (a.income + a.expense));
 };
 
 // Helper function to format currency
 const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0
+    maximumFractionDigits: 0,
   }).format(amount);
 };
