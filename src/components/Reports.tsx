@@ -20,7 +20,7 @@ import {
 import { useApp } from "@/contexts/AppContext";
 import type { Transaction } from "@/contexts/AppContext";
 import { formatCurrency, formatDate } from "@/utils/formatters";
-import { exportToExcel } from "@/utils/excelExportFixed";
+import { exportToExcel } from "@/utils/excelExport";
 import {
   Download,
   FileText,
