@@ -377,30 +377,36 @@ const Reports = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
           Laporan Keuangan Komprehensif
         </h2>
-        <div className="flex space-x-2">
+        <div className="flex flex-col sm:flex-row gap-2">
           <Button
             onClick={generateCSV}
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
             disabled={filteredTransactions.length === 0}
+            size="sm"
           >
             <Download className="mr-2 h-4 w-4" />
-            Export CSV
+            <span className="hidden sm:inline">Export </span>CSV
           </Button>
           <Button
             onClick={generateExcel}
             disabled={isExporting || filteredTransactions.length === 0}
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
+            size="sm"
           >
             {isExporting ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <FileSpreadsheet className="mr-2 h-4 w-4" />
             )}
-            {isExporting ? "Exporting..." : "Export Excel"}
+            {isExporting ? "Exporting..." : (
+              <>
+                <span className="hidden sm:inline">Export </span>Excel
+              </>
+            )}
           </Button>
         </div>
       </div>
@@ -413,13 +419,13 @@ const Reports = () => {
             <span>Filter Laporan</span>
           </CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium mb-2">
               Jenis Laporan
             </label>
             <Select value={reportType} onValueChange={setReportType}>
-              <SelectTrigger>
+              <SelectTrigger className="h-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -438,6 +444,7 @@ const Reports = () => {
               type="date"
               value={dateFrom}
               onChange={(e) => setDateFrom(e.target.value)}
+              className="h-10"
             />
           </div>
           <div>
@@ -448,6 +455,7 @@ const Reports = () => {
               type="date"
               value={dateTo}
               onChange={(e) => setDateTo(e.target.value)}
+              className="h-10"
             />
           </div>
           <div className="flex items-end">
@@ -467,44 +475,44 @@ const Reports = () => {
       </Card>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="hover:shadow-md transition-shadow">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
                   Total Pemasukan
                 </p>
-                <p className="text-2xl font-bold text-green-600">
+                <p className="text-lg sm:text-2xl font-bold text-green-600 break-words">
                   {formatCurrency(totalIncome)}
                 </p>
                 <p className="text-xs text-gray-500">
                   {filteredIncome.length} transaksi
                 </p>
               </div>
-              <div className="p-3 rounded-full bg-green-50">
-                <TrendingUp className="h-6 w-6 text-green-600" />
+              <div className="p-2 sm:p-3 rounded-full bg-green-50 flex-shrink-0 ml-2">
+                <TrendingUp className="h-4 w-4 sm:h-6 sm:w-6 text-green-600" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-6">
+        <Card className="hover:shadow-md transition-shadow">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
                   Total Pengeluaran
                 </p>
-                <p className="text-2xl font-bold text-red-600">
+                <p className="text-lg sm:text-2xl font-bold text-red-600 break-words">
                   {formatCurrency(totalExpense)}
                 </p>
                 <p className="text-xs text-gray-500">
                   {filteredExpenses.length} transaksi
                 </p>
               </div>
-              <div className="p-3 rounded-full bg-red-50">
-                <TrendingDown className="h-6 w-6 text-red-600" />
+              <div className="p-2 sm:p-3 rounded-full bg-red-50 flex-shrink-0 ml-2">
+                <TrendingDown className="h-4 w-4 sm:h-6 sm:w-6 text-red-600" />
               </div>
             </div>
           </CardContent>

@@ -77,18 +77,18 @@ const IncomeManagement = () => {
   const canDelete = user?.role === 'treasurer';
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Manajemen Pemasukan</h2>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Manajemen Pemasukan</h2>
         {user?.role === 'treasurer' && (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700">
+              <Button className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto">
                 <Plus className="mr-2 h-4 w-4" />
                 Tambah Pemasukan
               </Button>
             </DialogTrigger>
-            <DialogContent>
+            <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>Tambah Pemasukan Baru</DialogTitle>
               </DialogHeader>
@@ -100,6 +100,7 @@ const IncomeManagement = () => {
                     value={formData.amount}
                     onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
                     placeholder="0"
+                    className="text-base"
                     required
                   />
                 </div>
@@ -107,7 +108,7 @@ const IncomeManagement = () => {
                 <div>
                   <label className="block text-sm font-medium mb-2">Sumber Dana</label>
                   <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
-                    <SelectTrigger>
+                    <SelectTrigger className="text-base">
                       <SelectValue placeholder="Pilih sumber dana" />
                     </SelectTrigger>
                     <SelectContent>
@@ -149,34 +150,34 @@ const IncomeManagement = () => {
         )}
       </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-3 sm:gap-4">
         {incomeTransactions.length === 0 ? (
           <Card>
-            <CardContent className="p-8 text-center">
+            <CardContent className="p-6 sm:p-8 text-center">
               <p className="text-gray-500">Belum ada data pemasukan</p>
             </CardContent>
           </Card>
         ) : (
           incomeTransactions.map((transaction) => (
             <Card key={transaction.id} className="hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <h3 className="font-semibold text-lg">{transaction.description}</h3>
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+              <CardContent className="p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-3 sm:space-y-0">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2 mb-2">
+                      <h3 className="font-semibold text-base sm:text-lg truncate">{transaction.description}</h3>
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full self-start sm:self-auto flex-shrink-0">
                         {transaction.category}
                       </span>
                     </div>
                     
-                    <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-1 sm:space-y-0 text-sm text-gray-600 mb-2">
                       <div className="flex items-center space-x-1">
-                        <Calendar className="h-4 w-4" />
-                        <span>{formatDateTime(transaction.date)}</span>
+                        <Calendar className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                        <span className="truncate">{formatDateTime(transaction.date)}</span>
                       </div>
                       <div className="flex items-center space-x-1">
-                        <User className="h-4 w-4" />
-                        <span>{transaction.createdBy}</span>
+                        <User className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                        <span className="truncate">{transaction.createdBy}</span>
                       </div>
                     </div>
 

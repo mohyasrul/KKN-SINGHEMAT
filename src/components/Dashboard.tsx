@@ -69,23 +69,23 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card key={index} className="hover:shadow-lg transition-shadow">
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 truncate">
                       {stat.title}
                     </p>
-                    <p className={`text-2xl font-bold ${stat.color}`}>
+                    <p className={`text-lg sm:text-2xl font-bold ${stat.color} break-words`}>
                       {stat.isCount ? stat.value : formatCurrency(stat.value)}
                     </p>
                   </div>
-                  <div className={`p-3 rounded-full ${stat.bg}`}>
-                    <Icon className={`h-6 w-6 ${stat.color}`} />
+                  <div className={`p-2 sm:p-3 rounded-full ${stat.bg} flex-shrink-0 ml-2`}>
+                    <Icon className={`h-4 w-4 sm:h-6 sm:w-6 ${stat.color}`} />
                   </div>
                 </div>
               </CardContent>
@@ -94,57 +94,59 @@ const Dashboard = () => {
         })}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <FileText className="h-5 w-5" />
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
+              <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
               <span>Transaksi Terbaru</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+          <CardContent className="p-3 sm:p-6">
+            <div className="space-y-3">
               {recentTransactions.length === 0 ? (
-                <p className="text-gray-500 text-center">Belum ada transaksi</p>
+                <p className="text-gray-500 text-center py-4">Belum ada transaksi</p>
               ) : (
                 recentTransactions.map((transaction) => (
                   <div
                     key={transaction.id}
-                    className="flex items-center justify-between border-b pb-2"
+                    className="flex items-start sm:items-center justify-between border-b pb-3 last:border-b-0"
                   >
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-start sm:items-center space-x-3 flex-1 min-w-0">
                       <div
-                        className={`p-2 rounded-full ${
+                        className={`p-1.5 sm:p-2 rounded-full flex-shrink-0 ${
                           transaction.type === "income"
                             ? "bg-green-100"
                             : "bg-red-100"
                         }`}
                       >
                         {transaction.type === "income" ? (
-                          <TrendingUp className="h-4 w-4 text-green-600" />
+                          <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4 text-green-600" />
                         ) : (
-                          <TrendingDown className="h-4 w-4 text-red-600" />
+                          <TrendingDown className="h-3 w-3 sm:h-4 sm:w-4 text-red-600" />
                         )}
                       </div>
-                      <div>
-                        <p className="font-medium">{transaction.description}</p>
-                        <p className="text-sm text-gray-500">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-sm sm:text-base truncate">{transaction.description}</p>
+                        <p className="text-xs sm:text-sm text-gray-500">
                           {new Date(transaction.date).toLocaleDateString(
                             "id-ID"
                           )}
                         </p>
                       </div>
                     </div>
-                    <p
-                      className={`font-semibold ${
-                        transaction.type === "income"
-                          ? "text-green-600"
-                          : "text-red-600"
-                      }`}
-                    >
-                      {transaction.type === "income" ? "+" : "-"}
-                      {formatCurrency(transaction.amount)}
-                    </p>
+                    <div className="text-right flex-shrink-0 ml-2">
+                      <p
+                        className={`font-semibold text-sm sm:text-base ${
+                          transaction.type === "income"
+                            ? "text-green-600"
+                            : "text-red-600"
+                        }`}
+                      >
+                        {transaction.type === "income" ? "+" : "-"}
+                        {formatCurrency(transaction.amount)}
+                      </p>
+                    </div>
                   </div>
                 ))
               )}
@@ -153,16 +155,16 @@ const Dashboard = () => {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <FileText className="h-5 w-5" />
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center space-x-2 text-base sm:text-lg">
+              <FileText className="h-4 w-4 sm:h-5 sm:w-5" />
               <span>Status Program Kerja</span>
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
+          <CardContent className="p-3 sm:p-6">
+            <div className="space-y-3">
               {programs.length === 0 ? (
-                <p className="text-gray-500 text-center">
+                <p className="text-gray-500 text-center py-4">
                   Belum ada program kerja
                 </p>
               ) : (
