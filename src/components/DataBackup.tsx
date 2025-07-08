@@ -3,12 +3,14 @@ import { useApp } from "../contexts/AppContext";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Alert, AlertDescription } from "./ui/alert";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import {
   Download,
   Upload,
   Shield,
   AlertTriangle,
   CheckCircle,
+  FileText,
 } from "lucide-react";
 import { validateAppData, sanitizeData } from "../utils/dataValidation";
 
@@ -17,7 +19,11 @@ const DataBackup: React.FC = () => {
   const [importStatus, setImportStatus] = useState<{
     type: "success" | "error" | "warning" | null;
     message: string;
-  }>({ type: null, message: "" });
+  }>({ type: null, message: "" });  const [isImporting, setIsImporting] = useState(false);
+  const [showImportDialog, setShowImportDialog] = useState(false);
+
+  // Create ref for file input to ensure proper access
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   /**
    * Exports current app data as encrypted backup file
@@ -58,7 +64,6 @@ const DataBackup: React.FC = () => {
       });
     }
   };
-
   /**
    * Imports data from backup file with validation
    */
@@ -66,11 +71,15 @@ const DataBackup: React.FC = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
+    setIsImporting(true);
+    setImportStatus({ type: null, message: "" });
+
     if (!file.name.endsWith(".json")) {
       setImportStatus({
         type: "error",
         message: "Invalid file type. Please select a JSON backup file.",
       });
+      setIsImporting(false);
       return;
     }
 
@@ -106,6 +115,8 @@ const DataBackup: React.FC = () => {
           message:
             "Invalid backup file or corrupted data. Please check your file and try again.",
         });
+      } finally {
+        setIsImporting(false);
       }
     };
 
@@ -114,12 +125,31 @@ const DataBackup: React.FC = () => {
         type: "error",
         message: "Failed to read file. Please try again.",
       });
+      setIsImporting(false);
     };
 
     reader.readAsText(file);
 
     // Reset file input
     event.target.value = "";
+  };
+  /**
+   * Triggers file input click programmatically
+   */
+  const handleImportClick = () => {
+    setShowImportDialog(true);
+  };
+
+  /**
+   * Confirms import and opens file dialog
+   */
+  const confirmImport = () => {
+    setShowImportDialog(false);
+    setTimeout(() => {
+      if (fileInputRef.current) {
+        fileInputRef.current.click();
+      }
+    }, 100); // Small delay to ensure dialog closes first
   };
 
   /**
@@ -193,44 +223,105 @@ const DataBackup: React.FC = () => {
               {importStatus.message}
             </AlertDescription>
           </Alert>
-        )}
-
-        {/* Export Section */}
+        )}        {/* Export Section */}
         <div className="space-y-3">
           <h3 className="font-semibold text-lg">Export Backup</h3>
           <p className="text-sm text-gray-600">
             Create a backup file of all your budget data. This file contains all
             income, expense, and program information.
           </p>
-          <Button onClick={exportData} className="flex items-center gap-2">
+          <Button 
+            onClick={exportData} 
+            className="flex items-center gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation hover:bg-blue-700 active:bg-blue-800 transition-colors"
+          >
             <Download size={16} />
             Export Backup File
           </Button>
-        </div>
-
-        {/* Import Section */}
+        </div>        {/* Import Section */}
         <div className="space-y-3">
           <h3 className="font-semibold text-lg">Import Backup</h3>
           <p className="text-sm text-gray-600">
             Restore data from a previously exported backup file. This will
             replace all current data.
           </p>
-          <label htmlFor="import-data" className="block">
-            <input
-              id="import-data"
-              type="file"
-              accept=".json"
-              onChange={importData}
-              className="hidden"
-            />
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 cursor-pointer"
-            >
-              <Upload size={16} />
-              Import Backup File
-            </Button>
-          </label>
+          
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".json"
+            onChange={importData}
+            className="hidden"
+            aria-label="Import backup file"
+          />
+          
+          {/* Import button with confirmation dialog */}
+          <Dialog open={showImportDialog} onOpenChange={setShowImportDialog}>
+            <DialogTrigger asChild>
+              <Button
+                variant="outline"
+                onClick={handleImportClick}
+                disabled={isImporting}
+                className="flex items-center gap-2 w-full sm:w-auto min-h-[44px] touch-manipulation hover:bg-gray-50 active:bg-gray-100 transition-colors"
+              >
+                <Upload size={16} className={isImporting ? "animate-pulse" : ""} />
+                {isImporting ? "Importing..." : "Import Backup File"}
+              </Button>
+            </DialogTrigger>
+            
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-orange-500" />
+                  Confirm Data Import
+                </DialogTitle>
+              </DialogHeader>
+              
+              <div className="space-y-4">
+                <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                  <p className="text-sm text-orange-800">
+                    <strong>⚠️ Warning:</strong> Importing a backup will replace ALL current data including:
+                  </p>
+                  <ul className="text-sm text-orange-700 mt-2 space-y-1">
+                    <li>• All income and expense transactions</li>
+                    <li>• All program data and budgets</li>
+                    <li>• Current user settings</li>
+                  </ul>
+                </div>
+                
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-sm text-blue-800">
+                    <strong>💡 Recommendation:</strong> Export a backup of your current data before importing, so you can restore it if needed.
+                  </p>
+                </div>
+                
+                <div className="flex flex-col sm:flex-row gap-2 pt-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowImportDialog(false)}
+                    className="flex-1"
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    onClick={confirmImport}
+                    className="flex-1 bg-orange-600 hover:bg-orange-700"
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Choose Backup File
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+          
+          {/* Import progress indicator */}
+          {isImporting && (
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+              Processing backup file...
+            </div>
+          )}
         </div>
 
         {/* Security Information */}

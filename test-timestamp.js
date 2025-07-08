@@ -8,10 +8,10 @@ const testCurrentDateTime = () => {
   const now = new Date();
   const dateString = now.toISOString().split("T")[0];
   const timeString = now.toTimeString().slice(0, 5);
-  
+
   console.log("✅ Current Date:", dateString);
   console.log("✅ Current Time:", timeString);
-  
+
   return { dateString, timeString };
 };
 
@@ -19,9 +19,9 @@ const testCurrentDateTime = () => {
 const testISOTimestamp = (date, time) => {
   const dateTime = new Date(`${date}T${time}`);
   const isoDateTime = dateTime.toISOString();
-  
+
   console.log("✅ ISO Timestamp:", isoDateTime);
-  
+
   return isoDateTime;
 };
 
@@ -29,24 +29,24 @@ const testISOTimestamp = (date, time) => {
 const testFormatters = (isoTimestamp) => {
   // Simulate Indonesian formatters
   const date = new Date(isoTimestamp);
-  
-  const formatDateTime = date.toLocaleString('id-ID', {
-    year: 'numeric',
-    month: 'short', 
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+
+  const formatDateTime = date.toLocaleString("id-ID", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
-  
-  const formatTimeOnly = date.toLocaleTimeString('id-ID', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
+
+  const formatTimeOnly = date.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
   });
-  
+
   console.log("✅ Formatted DateTime:", formatDateTime);
   console.log("✅ Formatted Time Only:", formatTimeOnly);
-  
+
   return { formatDateTime, formatTimeOnly };
 };
 
@@ -56,7 +56,7 @@ const testRelativeTime = (isoTimestamp) => {
   const targetDate = new Date(isoTimestamp);
   const diffMs = now.getTime() - targetDate.getTime();
   const diffMinutes = Math.floor(diffMs / (1000 * 60));
-  
+
   let relativeTime;
   if (diffMinutes < 1) {
     relativeTime = "Baru saja";
@@ -65,28 +65,28 @@ const testRelativeTime = (isoTimestamp) => {
   } else {
     relativeTime = "Lebih dari 1 jam yang lalu";
   }
-  
+
   console.log("✅ Relative Time:", relativeTime);
-  
+
   return relativeTime;
 };
 
 // Run All Tests
 const runTimestampTests = () => {
   console.log("\n🚀 Starting Real-Time Timestamp Tests...\n");
-  
+
   // Test current date/time
   const { dateString, timeString } = testCurrentDateTime();
-  
+
   // Test ISO creation
   const isoTimestamp = testISOTimestamp(dateString, timeString);
-  
+
   // Test formatters
   testFormatters(isoTimestamp);
-  
+
   // Test relative time (using current timestamp, so it should be "Baru saja")
   testRelativeTime(isoTimestamp);
-  
+
   console.log("\n✅ All timestamp tests completed!");
   console.log("🎯 Real-time timestamp implementation is working correctly!");
 };
@@ -100,7 +100,7 @@ window.timestampTests = {
   testISOTimestamp,
   testFormatters,
   testRelativeTime,
-  runAll: runTimestampTests
+  runAll: runTimestampTests,
 };
 
 console.log("\n📝 Manual testing available via window.timestampTests");

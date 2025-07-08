@@ -1,44 +1,56 @@
-
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useApp } from '@/contexts/AppContext';
-import { useToast } from '@/hooks/use-toast';
-import { formatCurrency, formatDateTime } from '@/utils/formatters';
-import { Minus, Trash2, Calendar, User, Camera } from 'lucide-react';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useApp } from "@/contexts/AppContext";
+import { useToast } from "@/hooks/use-toast";
+import { formatCurrency, formatDateTime } from "@/utils/formatters";
+import { Minus, Trash2, Calendar, User, Camera } from "lucide-react";
 
 const ExpenseManagement = () => {
-  const { transactions, programs, addTransaction, deleteTransaction, user } = useApp();
+  const { transactions, programs, addTransaction, deleteTransaction, user } =
+    useApp();
   const { toast } = useToast();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [formData, setFormData] = useState({
-    amount: '',
-    description: '',
-    date: new Date().toISOString().split('T')[0],
+    amount: "",
+    description: "",
+    date: new Date().toISOString().split("T")[0],
     time: new Date().toTimeString().slice(0, 5), // HH:MM format
-    category: '',
-    programId: '',
-    receipt: '',
+    category: "",
+    programId: "",
+    receipt: "",
   });
 
   const expenseCategories = [
-    'Konsumsi',
-    'Transportasi',
-    'Alat dan Bahan',
-    'Dokumentasi',
-    'Administrasi',
-    'Lainnya'
+    "Konsumsi",
+    "Transportasi",
+    "Alat dan Bahan",
+    "Dokumentasi",
+    "Administrasi",
+    "Lainnya",
   ];
 
-  const expenseTransactions = transactions.filter(t => t.type === 'expense');
+  const expenseTransactions = transactions.filter((t) => t.type === "expense");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.amount || !formData.description) {
       toast({
         title: "Error",
@@ -53,12 +65,15 @@ const ExpenseManagement = () => {
     const isoDateTime = dateTime.toISOString();
 
     addTransaction({
-      type: 'expense',
+      type: "expense",
       amount: parseFloat(formData.amount),
       description: formData.description,
       date: isoDateTime, // Use full ISO timestamp
-      category: formData.category || 'Lainnya',
-      programId: formData.programId === 'general' ? undefined : formData.programId || undefined,
+      category: formData.category || "Lainnya",
+      programId:
+        formData.programId === "general"
+          ? undefined
+          : formData.programId || undefined,
       receipt: formData.receipt || undefined,
     });
 
@@ -70,13 +85,13 @@ const ExpenseManagement = () => {
     // Reset form with current date/time
     const now = new Date();
     setFormData({
-      amount: '',
-      description: '',
-      date: now.toISOString().split('T')[0],
+      amount: "",
+      description: "",
+      date: now.toISOString().split("T")[0],
       time: now.toTimeString().slice(0, 5),
-      category: '',
-      programId: '',
-      receipt: '',
+      category: "",
+      programId: "",
+      receipt: "",
     });
     setIsDialogOpen(false);
   };
@@ -89,17 +104,19 @@ const ExpenseManagement = () => {
     });
   };
 
-  const canDelete = user?.role === 'treasurer';
+  const canDelete = user?.role === "treasurer";
   const getProgramName = (programId: string) => {
-    const program = programs.find(p => p.id === programId);
-    return program ? program.name : 'Umum';
+    const program = programs.find((p) => p.id === programId);
+    return program ? program.name : "Umum";
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Manajemen Pengeluaran</h2>
-        {user?.role === 'treasurer' && (
+        <h2 className="text-2xl font-bold text-gray-900">
+          Manajemen Pengeluaran
+        </h2>
+        {user?.role === "treasurer" && (
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button className="bg-red-600 hover:bg-red-700">
@@ -113,19 +130,33 @@ const ExpenseManagement = () => {
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Jumlah (Rp)</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Jumlah (Rp)
+                  </label>
                   <Input
                     type="number"
                     value={formData.amount}
-                    onChange={(e) => setFormData(prev => ({ ...prev, amount: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        amount: e.target.value,
+                      }))
+                    }
                     placeholder="0"
                     required
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-sm font-medium mb-2">Kategori</label>
-                  <Select value={formData.category} onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}>
+                  <label className="block text-sm font-medium mb-2">
+                    Kategori
+                  </label>
+                  <Select
+                    value={formData.category}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, category: value }))
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih kategori" />
                     </SelectTrigger>
@@ -140,8 +171,15 @@ const ExpenseManagement = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Program Kerja (Opsional)</label>
-                  <Select value={formData.programId} onValueChange={(value) => setFormData(prev => ({ ...prev, programId: value }))}>
+                  <label className="block text-sm font-medium mb-2">
+                    Program Kerja (Opsional)
+                  </label>
+                  <Select
+                    value={formData.programId}
+                    onValueChange={(value) =>
+                      setFormData((prev) => ({ ...prev, programId: value }))
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Pilih program kerja" />
                     </SelectTrigger>
@@ -157,10 +195,17 @@ const ExpenseManagement = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Keterangan</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Keterangan
+                  </label>
                   <Textarea
                     value={formData.description}
-                    onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
                     placeholder="Deskripsi pengeluaran..."
                     required
                   />
@@ -168,22 +213,36 @@ const ExpenseManagement = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2">Tanggal</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Tanggal
+                    </label>
                     <Input
                       type="date"
                       value={formData.date}
-                      onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          date: e.target.value,
+                        }))
+                      }
                       className="text-base"
                       required
                     />
                   </div>
-                  
+
                   <div>
-                    <label className="block text-sm font-medium mb-2">Waktu</label>
+                    <label className="block text-sm font-medium mb-2">
+                      Waktu
+                    </label>
                     <Input
                       type="time"
                       value={formData.time}
-                      onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          time: e.target.value,
+                        }))
+                      }
                       className="text-base"
                       required
                     />
@@ -191,11 +250,18 @@ const ExpenseManagement = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Bukti Transaksi (Opsional)</label>
+                  <label className="block text-sm font-medium mb-2">
+                    Bukti Transaksi (Opsional)
+                  </label>
                   <Input
                     type="text"
                     value={formData.receipt}
-                    onChange={(e) => setFormData(prev => ({ ...prev, receipt: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        receipt: e.target.value,
+                      }))
+                    }
                     placeholder="URL atau keterangan bukti"
                   />
                 </div>
@@ -218,12 +284,17 @@ const ExpenseManagement = () => {
           </Card>
         ) : (
           expenseTransactions.map((transaction) => (
-            <Card key={transaction.id} className="hover:shadow-md transition-shadow">
+            <Card
+              key={transaction.id}
+              className="hover:shadow-md transition-shadow"
+            >
               <CardContent className="p-6">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-2">
-                      <h3 className="font-semibold text-lg">{transaction.description}</h3>
+                      <h3 className="font-semibold text-lg">
+                        {transaction.description}
+                      </h3>
                       <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
                         {transaction.category}
                       </span>
@@ -233,7 +304,7 @@ const ExpenseManagement = () => {
                         </span>
                       )}
                     </div>
-                    
+
                     <div className="flex items-center space-x-4 text-sm text-gray-600 mb-2">
                       <div className="flex items-center space-x-1">
                         <Calendar className="h-4 w-4" />

@@ -2,7 +2,11 @@ import React, { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useApp } from "@/contexts/AppContext";
-import { formatCurrency, formatDateTime, formatRelativeTime } from "@/utils/formatters";
+import {
+  formatCurrency,
+  formatDateTime,
+  formatRelativeTime,
+} from "@/utils/formatters";
 import DataBackup from "./DataBackup";
 import SecurityStatus from "./SecurityStatus";
 import {

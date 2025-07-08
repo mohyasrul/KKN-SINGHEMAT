@@ -182,13 +182,16 @@ const IncomeManagement = () => {
                       type="date"
                       value={formData.date}
                       onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, date: e.target.value }))
+                        setFormData((prev) => ({
+                          ...prev,
+                          date: e.target.value,
+                        }))
                       }
                       className="text-base"
                       required
                     />
                   </div>
-                  
+
                   <div>
                     <label className="block text-sm font-medium mb-2">
                       Waktu
@@ -197,7 +200,10 @@ const IncomeManagement = () => {
                       type="time"
                       value={formData.time}
                       onChange={(e) =>
-                        setFormData((prev) => ({ ...prev, time: e.target.value }))
+                        setFormData((prev) => ({
+                          ...prev,
+                          time: e.target.value,
+                        }))
                       }
                       className="text-base"
                       required
