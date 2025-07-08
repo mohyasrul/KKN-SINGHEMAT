@@ -108,42 +108,42 @@
     min-width: 44px;
     touch-action: manipulation;
   }
-  
+
   /* Better mobile scrolling */
   .scroll-smooth-mobile {
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
   }
-  
+
   /* Prevent zoom on input focus (iOS) */
   .input-no-zoom {
     font-size: 16px;
   }
-  
+
   /* Better mobile tap targets */
   .tap-target {
     padding: 12px;
     margin: 4px;
   }
-  
+
   /* Mobile-friendly card spacing */
   .card-mobile {
     margin: 8px;
     padding: 16px;
     border-radius: 12px;
   }
-  
+
   /* Optimized mobile text */
   .text-mobile-sm {
     font-size: 14px;
     line-height: 1.4;
   }
-  
+
   .text-mobile-base {
     font-size: 16px;
     line-height: 1.5;
   }
-  
+
   /* Mobile navigation improvements */
   .nav-mobile {
     position: sticky;
@@ -151,7 +151,7 @@
     z-index: 50;
     backdrop-filter: blur(8px);
   }
-  
+
   /* Better mobile form fields */
   .form-mobile input,
   .form-mobile select,
@@ -159,6 +159,66 @@
     font-size: 16px;
     padding: 12px;
     border-radius: 8px;
+  }
+
+  /* Bottom Navigation Bar Optimizations */
+  /* Safe area support for iPhone X+ */
+  .safe-area-inset-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Bottom navigation specific styles */
+  .bottom-nav {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  /* Active tab animation */
+  .bottom-nav-tab {
+    transition: all 0.2s ease-in-out;
+    transform-origin: center;
+  }
+
+  .bottom-nav-tab:active {
+    transform: scale(0.95);
+  }
+
+  .bottom-nav-tab.active {
+    animation: bottomNavActivate 0.3s ease-out;
+  }
+
+  @keyframes bottomNavActivate {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  /* Bottom navigation shadow */
+  .bottom-nav-shadow {
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Active indicator line animation */
+  .active-indicator {
+    animation: slideIn 0.3s ease-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      width: 0;
+      opacity: 0;
+    }
+    to {
+      width: 100%;
+      opacity: 1;
+    }
   }
 }
 
@@ -168,7 +228,7 @@
     padding-left: 16px;
     padding-right: 16px;
   }
-  
+
   /* Improve button spacing on mobile */
   .btn-mobile {
     padding: 12px 16px;
@@ -176,27 +236,56 @@
     width: 100%;
     margin-bottom: 8px;
   }
-  
+
   /* Better mobile tables */
   .table-mobile {
     font-size: 14px;
   }
-  
+
   .table-mobile th,
   .table-mobile td {
     padding: 8px 4px;
   }
-  
+
   /* Mobile card optimization */
   .card-mobile-compact {
     padding: 12px;
     margin: 4px 0;
   }
-  
+
   /* Better mobile modals */
   .modal-mobile {
     margin: 16px;
     max-height: calc(100vh - 32px);
     overflow-y: auto;
+  }
+}
+
+/* iOS specific optimizations */
+@supports (padding: max(0px)) {
+  .bottom-nav {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+}
+
+/* Mobile bottom navigation improvements */
+@media (max-width: 768px) {
+  /* Ensure content doesn't hide behind bottom nav */
+  .mobile-content {
+    padding-bottom: 80px;
+  }
+
+  /* Better touch targets for bottom nav */
+  .bottom-nav button {
+    min-height: 64px;
+    touch-action: manipulation;
+  }
+
+  /* Improve text truncation in bottom nav */
+  .bottom-nav-label {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }

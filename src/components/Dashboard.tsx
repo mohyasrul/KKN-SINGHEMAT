@@ -80,11 +80,15 @@ const Dashboard = () => {
                     <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 truncate">
                       {stat.title}
                     </p>
-                    <p className={`text-lg sm:text-2xl font-bold ${stat.color} break-words`}>
+                    <p
+                      className={`text-lg sm:text-2xl font-bold ${stat.color} break-words`}
+                    >
                       {stat.isCount ? stat.value : formatCurrency(stat.value)}
                     </p>
                   </div>
-                  <div className={`p-2 sm:p-3 rounded-full ${stat.bg} flex-shrink-0 ml-2`}>
+                  <div
+                    className={`p-2 sm:p-3 rounded-full ${stat.bg} flex-shrink-0 ml-2`}
+                  >
                     <Icon className={`h-4 w-4 sm:h-6 sm:w-6 ${stat.color}`} />
                   </div>
                 </div>
@@ -105,7 +109,9 @@ const Dashboard = () => {
           <CardContent className="p-3 sm:p-6">
             <div className="space-y-3">
               {recentTransactions.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">Belum ada transaksi</p>
+                <p className="text-gray-500 text-center py-4">
+                  Belum ada transaksi
+                </p>
               ) : (
                 recentTransactions.map((transaction) => (
                   <div
@@ -127,7 +133,9 @@ const Dashboard = () => {
                         )}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-medium text-sm sm:text-base truncate">{transaction.description}</p>
+                        <p className="font-medium text-sm sm:text-base truncate">
+                          {transaction.description}
+                        </p>
                         <p className="text-xs sm:text-sm text-gray-500">
                           {new Date(transaction.date).toLocaleDateString(
                             "id-ID"

@@ -44,10 +44,8 @@ const MainApp = () => {
     <div className="min-h-screen bg-gray-50">
       <Navigation activeTab={activeTab} setActiveTab={setActiveTab} />
       <UpdateNotification />
-      <main className="px-3 py-4 sm:p-4 md:p-6 max-w-7xl mx-auto">
-        <div className="space-y-4 sm:space-y-6">
-          {renderContent()}
-        </div>
+      <main className="px-3 py-4 sm:p-4 md:p-6 max-w-7xl mx-auto pb-20 md:pb-6">
+        <div className="space-y-4 sm:space-y-6">{renderContent()}</div>
       </main>
     </div>
   );
