@@ -19,6 +19,7 @@ const ExpenseManagement = () => {
     amount: '',
     description: '',
     date: new Date().toISOString().split('T')[0],
+    time: new Date().toTimeString().slice(0, 5), // HH:MM format
     category: '',
     programId: '',
     receipt: '',
@@ -47,11 +48,15 @@ const ExpenseManagement = () => {
       return;
     }
 
+    // Combine date and time for accurate timestamp
+    const dateTime = new Date(`${formData.date}T${formData.time}`);
+    const isoDateTime = dateTime.toISOString();
+
     addTransaction({
       type: 'expense',
       amount: parseFloat(formData.amount),
       description: formData.description,
-      date: formData.date,
+      date: isoDateTime, // Use full ISO timestamp
       category: formData.category || 'Lainnya',
       programId: formData.programId === 'general' ? undefined : formData.programId || undefined,
       receipt: formData.receipt || undefined,
@@ -62,10 +67,13 @@ const ExpenseManagement = () => {
       description: "Pengeluaran berhasil ditambahkan",
     });
 
+    // Reset form with current date/time
+    const now = new Date();
     setFormData({
       amount: '',
       description: '',
-      date: new Date().toISOString().split('T')[0],
+      date: now.toISOString().split('T')[0],
+      time: now.toTimeString().slice(0, 5),
       category: '',
       programId: '',
       receipt: '',
@@ -158,14 +166,28 @@ const ExpenseManagement = () => {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">Tanggal</label>
-                  <Input
-                    type="date"
-                    value={formData.date}
-                    onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
-                    required
-                  />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Tanggal</label>
+                    <Input
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) => setFormData(prev => ({ ...prev, date: e.target.value }))}
+                      className="text-base"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Waktu</label>
+                    <Input
+                      type="time"
+                      value={formData.time}
+                      onChange={(e) => setFormData(prev => ({ ...prev, time: e.target.value }))}
+                      className="text-base"
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div>

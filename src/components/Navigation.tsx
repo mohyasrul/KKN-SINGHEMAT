@@ -85,7 +85,7 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab }) => {
       <div className="md:hidden bg-gradient-to-r from-blue-800 to-blue-600 text-white shadow-lg">
         <div className="flex items-center justify-between p-4">
           <h1 className="text-xl font-bold">KKN15</h1>
-          
+
           <div className="flex items-center space-x-2">
             <OfflineIndicator />
             <Button
@@ -94,7 +94,11 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab }) => {
               size="sm"
               className="text-white hover:bg-blue-700"
             >
-              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {isMobileMenuOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
             </Button>
           </div>
         </div>
@@ -130,7 +134,7 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab }) => {
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
-            
+
             return (
               <button
                 key={item.id}
@@ -145,14 +149,18 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, setActiveTab }) => {
                 {isActive && (
                   <div className="absolute top-0 left-0 right-0 h-1 bg-blue-600 rounded-b-full"></div>
                 )}
-                
-                <Icon className={`h-5 w-5 mb-1 transition-colors ${
-                  isActive ? "text-blue-600" : "text-gray-600"
-                }`} />
-                
-                <span className={`font-medium truncate w-full text-center leading-tight ${
-                  isActive ? "text-blue-600" : "text-gray-600"
-                }`}>
+
+                <Icon
+                  className={`h-5 w-5 mb-1 transition-colors ${
+                    isActive ? "text-blue-600" : "text-gray-600"
+                  }`}
+                />
+
+                <span
+                  className={`font-medium truncate w-full text-center leading-tight ${
+                    isActive ? "text-blue-600" : "text-gray-600"
+                  }`}
+                >
                   {item.label}
                 </span>
               </button>
