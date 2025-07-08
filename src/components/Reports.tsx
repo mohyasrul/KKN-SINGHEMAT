@@ -17,6 +17,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 import { useApp } from "@/contexts/AppContext";
 import type { Transaction } from "@/contexts/AppContext";
 import { formatCurrency, formatDate } from "@/utils/formatters";
@@ -31,6 +40,9 @@ import {
   Target,
   FileSpreadsheet,
   Loader2,
+  Filter,
+  MoreHorizontal,
+  Eye,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -391,206 +403,400 @@ const Reports = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-          Laporan Keuangan Komprehensif
-        </h2>
-        <div className="flex flex-col sm:flex-row gap-2">
-          <Button
-            onClick={generateCSV}
-            className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
-            disabled={filteredTransactions.length === 0}
-            size="sm"
-          >
-            <Download className="mr-2 h-4 w-4" />
-            <span className="hidden sm:inline">Export </span>CSV
-          </Button>
-          <Button
-            onClick={generateExcel}
-            disabled={isExporting || filteredTransactions.length === 0}
-            className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
-            size="sm"
-          >
-            {isExporting ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <FileSpreadsheet className="mr-2 h-4 w-4" />
-            )}
-            {isExporting ? (
-              "Exporting..."
-            ) : (
-              <>
-                <span className="hidden sm:inline">Export </span>Excel
-              </>
-            )}
-          </Button>
+    <div className="min-h-screen bg-gray-50 lg:bg-white">
+      {/* Mobile Header */}
+      <div className="sticky top-0 z-10 bg-white border-b border-gray-200 lg:relative lg:bg-transparent lg:border-0">
+        <div className="px-4 py-4 lg:px-0 lg:py-6">
+          <div className="flex items-center justify-between">
+            {/* Title */}
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg font-semibold text-gray-900 truncate lg:text-2xl lg:font-bold">
+                Laporan Keuangan
+              </h1>
+              <p className="text-sm text-gray-500 lg:hidden">
+                {filteredTransactions.length} transaksi
+              </p>
+              <p className="hidden lg:block text-base text-gray-600 mt-1">
+                Laporan Keuangan Komprehensif
+              </p>
+            </div>
+            
+            {/* Action Buttons - Mobile */}
+            <div className="flex items-center gap-2 lg:hidden">
+              {/* Filter Button - Mobile */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm" className="p-2">
+                    <Filter className="h-4 w-4" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="bottom" className="h-[85vh]">
+                  <SheetHeader className="pb-4">
+                    <SheetTitle className="flex items-center gap-2">
+                      <Filter className="h-5 w-5" />
+                      Filter Laporan
+                    </SheetTitle>
+                    <SheetDescription>
+                      Sesuaikan filter untuk melihat data yang diinginkan
+                    </SheetDescription>
+                  </SheetHeader>
+                  
+                  <div className="space-y-6">
+                    {/* Filter Controls */}
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2 text-gray-700">
+                          Jenis Laporan
+                        </label>
+                        <Select value={reportType} onValueChange={setReportType}>
+                          <SelectTrigger className="h-12">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="comprehensive">📊 Komprehensif</SelectItem>
+                            <SelectItem value="income">💰 Fokus Pemasukan</SelectItem>
+                            <SelectItem value="expenses">💸 Fokus Pengeluaran</SelectItem>
+                            <SelectItem value="programs">🎯 Program Kerja</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-sm font-medium mb-2 text-gray-700">
+                            Dari Tanggal
+                          </label>
+                          <Input
+                            type="date"
+                            value={dateFrom}
+                            onChange={(e) => setDateFrom(e.target.value)}
+                            className="h-12"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-2 text-gray-700">
+                            Sampai Tanggal
+                          </label>
+                          <Input
+                            type="date"
+                            value={dateTo}
+                            onChange={(e) => setDateTo(e.target.value)}
+                            className="h-12"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Reset Button */}
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setDateFrom("");
+                        setDateTo("");
+                        setSelectedProgram("");
+                      }}
+                      className="w-full h-12 text-base"
+                    >
+                      🔄 Reset Filter
+                    </Button>
+                    
+                    {/* Export Actions */}
+                    <div className="pt-4 border-t border-gray-200">
+                      <h3 className="text-sm font-medium text-gray-700 mb-3">Export Data</h3>
+                      <div className="space-y-3">
+                        <Button
+                          onClick={generateCSV}
+                          disabled={filteredTransactions.length === 0}
+                          className="w-full h-12 bg-green-600 hover:bg-green-700 text-base"
+                        >
+                          <Download className="mr-2 h-5 w-5" />
+                          Export CSV
+                        </Button>
+                        <Button
+                          onClick={generateExcel}
+                          disabled={isExporting || filteredTransactions.length === 0}
+                          className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-base"
+                        >
+                          {isExporting ? (
+                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          ) : (
+                            <FileSpreadsheet className="mr-2 h-5 w-5" />
+                          )}
+                          {isExporting ? "Exporting..." : "Export Excel"}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </SheetContent>
+              </Sheet>
+              
+              {/* More Actions - Mobile */}
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm" className="p-2">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="bottom" className="h-[50vh]">
+                  <SheetHeader className="pb-4">
+                    <SheetTitle>Aksi Lainnya</SheetTitle>
+                  </SheetHeader>
+                  <div className="space-y-3">
+                    <Button
+                      onClick={generateCSV}
+                      disabled={filteredTransactions.length === 0}
+                      variant="outline"
+                      className="w-full h-12 text-base justify-start"
+                    >
+                      <Download className="mr-3 h-5 w-5 text-green-600" />
+                      Export CSV
+                    </Button>
+                    <Button
+                      onClick={generateExcel}
+                      disabled={isExporting || filteredTransactions.length === 0}
+                      variant="outline"
+                      className="w-full h-12 text-base justify-start"
+                    >
+                      {isExporting ? (
+                        <Loader2 className="mr-3 h-5 w-5 animate-spin text-blue-600" />
+                      ) : (
+                        <FileSpreadsheet className="mr-3 h-5 w-5 text-blue-600" />
+                      )}
+                      {isExporting ? "Exporting..." : "Export Excel"}
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
+            
+            {/* Desktop Export Buttons */}
+            <div className="hidden lg:flex lg:gap-2">
+              <Button
+                onClick={generateCSV}
+                className="bg-green-600 hover:bg-green-700"
+                disabled={filteredTransactions.length === 0}
+                size="sm"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Export CSV
+              </Button>
+              <Button
+                onClick={generateExcel}
+                disabled={isExporting || filteredTransactions.length === 0}
+                className="bg-blue-600 hover:bg-blue-700"
+                size="sm"
+              >
+                {isExporting ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <FileSpreadsheet className="mr-2 h-4 w-4" />
+                )}
+                {isExporting ? "Exporting..." : "Export Excel"}
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Filter Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Calendar className="h-5 w-5" />
-            <span>Filter Laporan</span>
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Jenis Laporan
-            </label>
-            <Select value={reportType} onValueChange={setReportType}>
-              <SelectTrigger className="h-10">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="comprehensive">Komprehensif</SelectItem>
-                <SelectItem value="income">Fokus Pemasukan</SelectItem>
-                <SelectItem value="expenses">Fokus Pengeluaran</SelectItem>
-                <SelectItem value="programs">Program Kerja</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Dari Tanggal
-            </label>
-            <Input
-              type="date"
-              value={dateFrom}
-              onChange={(e) => setDateFrom(e.target.value)}
-              className="h-10"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              Sampai Tanggal
-            </label>
-            <Input
-              type="date"
-              value={dateTo}
-              onChange={(e) => setDateTo(e.target.value)}
-              className="h-10"
-            />
-          </div>
-          <div className="flex items-end">
-            <Button
-              variant="outline"
-              onClick={() => {
-                setDateFrom("");
-                setDateTo("");
-                setSelectedProgram("");
-              }}
-              className="w-full"
-            >
-              Reset Filter
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
-                  Total Pemasukan
-                </p>
-                <p className="text-lg sm:text-2xl font-bold text-green-600 break-words">
-                  {formatCurrency(totalIncome)}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {filteredIncome.length} transaksi
-                </p>
-              </div>
-              <div className="p-2 sm:p-3 rounded-full bg-green-50 flex-shrink-0 ml-2">
-                <TrendingUp className="h-4 w-4 sm:h-6 sm:w-6 text-green-600" />
-              </div>
+      {/* Main Content */}
+      <div className="px-4 pb-4 space-y-4 lg:px-0 lg:pb-0 lg:space-y-6">
+        {/* Desktop Filter Section */}
+        <Card className="hidden lg:block">
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Calendar className="h-5 w-5" />
+              <span>Filter Laporan</span>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Jenis Laporan
+              </label>
+              <Select value={reportType} onValueChange={setReportType}>
+                <SelectTrigger className="h-10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="comprehensive">Komprehensif</SelectItem>
+                  <SelectItem value="income">Fokus Pemasukan</SelectItem>
+                  <SelectItem value="expenses">Fokus Pengeluaran</SelectItem>
+                  <SelectItem value="programs">Program Kerja</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="p-4 sm:p-6">
-            <div className="flex items-center justify-between">
-              <div className="min-w-0 flex-1">
-                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1">
-                  Total Pengeluaran
-                </p>
-                <p className="text-lg sm:text-2xl font-bold text-red-600 break-words">
-                  {formatCurrency(totalExpense)}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {filteredExpenses.length} transaksi
-                </p>
-              </div>
-              <div className="p-2 sm:p-3 rounded-full bg-red-50 flex-shrink-0 ml-2">
-                <TrendingDown className="h-4 w-4 sm:h-6 sm:w-6 text-red-600" />
-              </div>
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Dari Tanggal
+              </label>
+              <Input
+                type="date"
+                value={dateFrom}
+                onChange={(e) => setDateFrom(e.target.value)}
+                className="h-10"
+              />
             </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Saldo</p>
-                <p
-                  className={`text-2xl font-bold ${
-                    balance >= 0 ? "text-blue-600" : "text-red-600"
-                  }`}
-                >
-                  {formatCurrency(balance)}
-                </p>
-                <p className="text-xs text-gray-500">
-                  Total: {filteredTransactions.length} transaksi
-                </p>
-              </div>
-              <div
-                className={`p-3 rounded-full ${
-                  balance >= 0 ? "bg-blue-50" : "bg-red-50"
-                }`}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Sampai Tanggal
+              </label>
+              <Input
+                type="date"
+                value={dateTo}
+                onChange={(e) => setDateTo(e.target.value)}
+                className="h-10"
+              />
+            </div>
+            <div className="flex items-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setDateFrom("");
+                  setDateTo("");
+                  setSelectedProgram("");
+                }}
+                className="w-full"
               >
-                <DollarSign
-                  className={`h-6 w-6 ${
-                    balance >= 0 ? "text-blue-600" : "text-red-600"
-                  }`}
-                />
-              </div>
+                Reset Filter
+              </Button>
             </div>
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  Program Aktif
-                </p>
-                <p className="text-2xl font-bold text-purple-600">
-                  {programs.length}
-                </p>
-                <p className="text-xs text-gray-500">
-                  {
-                    programs.filter((p) => p.usedBudget < p.allocatedBudget)
-                      .length
-                  }{" "}
-                  masih dalam budget
-                </p>
+        {/* Summary Cards - Mobile Optimized */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+          {/* Total Pemasukan */}
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-lg transition-all duration-200">
+            <CardContent className="p-3 lg:p-6">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="p-1.5 lg:p-2 rounded-lg bg-green-500 text-white lg:hidden">
+                      <TrendingUp className="h-3 w-3" />
+                    </div>
+                    <p className="text-xs lg:text-sm font-medium text-green-700 truncate">
+                      Pemasukan
+                    </p>
+                  </div>
+                  <p className="text-sm lg:text-2xl font-bold text-green-800 mb-1 break-words">
+                    {formatCurrency(totalIncome)}
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <Badge variant="secondary" className="text-xs bg-green-200 text-green-800 px-1.5 py-0.5">
+                      {filteredIncome.length}
+                    </Badge>
+                    <span className="text-xs text-green-600 hidden lg:inline">transaksi</span>
+                  </div>
+                </div>
+                <div className="hidden lg:block p-3 rounded-full bg-green-100">
+                  <TrendingUp className="h-6 w-6 text-green-600" />
+                </div>
               </div>
-              <div className="p-3 rounded-full bg-purple-50">
-                <Target className="h-6 w-6 text-purple-600" />
+            </CardContent>
+          </Card>
+
+          {/* Total Pengeluaran */}
+          <Card className="bg-gradient-to-br from-red-50 to-red-100 border-red-200 hover:shadow-lg transition-all duration-200">
+            <CardContent className="p-3 lg:p-6">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="p-1.5 lg:p-2 rounded-lg bg-red-500 text-white lg:hidden">
+                      <TrendingDown className="h-3 w-3" />
+                    </div>
+                    <p className="text-xs lg:text-sm font-medium text-red-700 truncate">
+                      Pengeluaran
+                    </p>
+                  </div>
+                  <p className="text-sm lg:text-2xl font-bold text-red-800 mb-1 break-words">
+                    {formatCurrency(totalExpense)}
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <Badge variant="secondary" className="text-xs bg-red-200 text-red-800 px-1.5 py-0.5">
+                      {filteredExpenses.length}
+                    </Badge>
+                    <span className="text-xs text-red-600 hidden lg:inline">transaksi</span>
+                  </div>
+                </div>
+                <div className="hidden lg:block p-3 rounded-full bg-red-100">
+                  <TrendingDown className="h-6 w-6 text-red-600" />
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+
+          {/* Saldo */}
+          <Card className={`bg-gradient-to-br border-2 hover:shadow-lg transition-all duration-200 ${
+            balance >= 0 
+              ? "from-blue-50 to-blue-100 border-blue-200" 
+              : "from-red-50 to-red-100 border-red-200"
+          }`}>
+            <CardContent className="p-3 lg:p-6">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className={`p-1.5 lg:p-2 rounded-lg text-white lg:hidden ${
+                      balance >= 0 ? "bg-blue-500" : "bg-red-500"
+                    }`}>
+                      <DollarSign className="h-3 w-3" />
+                    </div>
+                    <p className={`text-xs lg:text-sm font-medium truncate ${
+                      balance >= 0 ? "text-blue-700" : "text-red-700"
+                    }`}>
+                      Saldo
+                    </p>
+                  </div>
+                  <p className={`text-sm lg:text-2xl font-bold mb-1 break-words ${
+                    balance >= 0 ? "text-blue-800" : "text-red-800"
+                  }`}>
+                    {formatCurrency(balance)}
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <Badge variant={balance >= 0 ? "default" : "destructive"} className="text-xs px-1.5 py-0.5">
+                      {balance >= 0 ? "Surplus" : "Defisit"}
+                    </Badge>
+                  </div>
+                </div>
+                <div className={`hidden lg:block p-3 rounded-full ${
+                  balance >= 0 ? "bg-blue-100" : "bg-red-100"
+                }`}>
+                  <DollarSign className={`h-6 w-6 ${
+                    balance >= 0 ? "text-blue-600" : "text-red-600"
+                  }`} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Program Aktif */}
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-all duration-200">
+            <CardContent className="p-3 lg:p-6">
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="p-1.5 lg:p-2 rounded-lg bg-purple-500 text-white lg:hidden">
+                      <Target className="h-3 w-3" />
+                    </div>
+                    <p className="text-xs lg:text-sm font-medium text-purple-700 truncate">
+                      Program
+                    </p>
+                  </div>
+                  <p className="text-sm lg:text-2xl font-bold text-purple-800 mb-1">
+                    {programs.length}
+                  </p>
+                  <div className="flex items-center gap-1">
+                    <Badge variant="secondary" className="text-xs bg-purple-200 text-purple-800 px-1.5 py-0.5">
+                      {programs.filter((p) => p.usedBudget < p.allocatedBudget).length} aktif
+                    </Badge>
+                  </div>
+                </div>
+                <div className="hidden lg:block p-3 rounded-full bg-purple-100">
+                  <Target className="h-6 w-6 text-purple-600" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
       {/* Report Content Based on Type */}
       {reportType === "comprehensive" && (
@@ -924,6 +1130,7 @@ const Reports = () => {
           </CardContent>
         </Card>
       )}
+      </div>
     </div>
   );
 };
